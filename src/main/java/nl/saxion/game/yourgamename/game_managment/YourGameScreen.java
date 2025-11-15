@@ -1,61 +1,44 @@
 package nl.saxion.game.yourgamename.game_managment;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Input;
+import nl.saxion.game.yourgamename.movement.PlayerMovement;
 import nl.saxion.gameapp.GameApp;
 import nl.saxion.gameapp.screens.ScalableGameScreen;
+import nl.saxion.game.yourgamename.entities.*;
 
 public class YourGameScreen extends ScalableGameScreen {
-    String randomBoxColor = "violet-500";
-    String randomBackgroundColor = "black";
-    Box centeredBox = new Box();
+    final int PLAYER_SIZE = 150;
+    public static int worldWidth = 1280;
+    public static int worldHeight = 720;
+    Player player;
 
     public YourGameScreen() {
-        super(1280, 720);
+        super(worldWidth, worldHeight);
     }
 
     @Override
     public void show() {
-        randomBoxColor = getRandomColor();
-        centeredBox.width = 400;
-        centeredBox.height = 400;
+        GameApp.addTexture("player", "textures/bear.png");
+        player = new Player("test", 100, 10, 5, 300);
     }
 
     @Override
     public void render(float delta) {
         super.render(delta);
 
-        // Calculate where the box would be (we draw it in the center of the world)
-        float boxX = getWorldWidth() / 2 - centeredBox.width / 2;
-        float boxY = getWorldHeight() / 2 - centeredBox.height / 2;
+        GameApp.clearScreen("teal-300");
 
-        if (GameApp.isButtonJustPressed(Input.Buttons.LEFT)) {
-            float mouseX = getMouseX();
-            float mouseY = getMouseY();
+        PlayerMovement.checkMovementKeyPressed(player, delta);
+        PlayerMovement.setPositionBorder(player, worldWidth, worldHeight);
 
-            if (mouseX > boxX && mouseX < boxX + centeredBox.width && mouseY > boxY && mouseY < boxY + centeredBox.height) {
-                // If we pressed the box, then change the color of the box
-                randomBoxColor = getRandomColor();
-            } else {
-                // Otherwise change the color of the background
-                randomBackgroundColor = getRandomColor();
-            }
-        }
-
-        // Draw elements
-        GameApp.clearScreen(randomBackgroundColor);
-        GameApp.startShapeRenderingFilled();
-        GameApp.drawRect(boxX, boxY, centeredBox.width, centeredBox.height, randomBoxColor);
-        GameApp.endShapeRendering();
-
-    }
-
-    private String getRandomColor() {
-        int randomIndex = (int)GameApp.random(0, GameApp.getAllColors().length-1);
-        return GameApp.getAllColors()[randomIndex];
+        GameApp.startSpriteRendering();
+        GameApp.drawTexture("player", player.position.x, player.position.y, PLAYER_SIZE, PLAYER_SIZE);
+        GameApp.endSpriteRendering();
     }
 
     @Override
     public void hide() {
-
+        GameApp.disposeTexture("player");
     }
 }

@@ -1,4 +1,4 @@
-package nl.saxion.game.yourgamename;
+package nl.saxion.game.yourgamename.entities;
 
 public class StatSystem {
     private int knowledge;

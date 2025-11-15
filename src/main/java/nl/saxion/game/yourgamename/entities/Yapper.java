@@ -1,8 +1,11 @@
 package nl.saxion.game.yourgamename.entities;
 
+import nl.saxion.game.yourgamename.movement.Vector2;
+
 public class Yapper extends Character {
     private int damage;
     private int attackSpeed;
+    public Vector2 position = new Vector2();
 
     public Yapper(String name, int maxHealth, int damage, int attackSpeed){
         super(name, maxHealth);
