@@ -10,3 +10,4 @@ public abstract class Character {
         this.maxHealth = maxHealth;
     }
 }
+
