@@ -1,15 +1,18 @@
 package nl.saxion.game.yourgamename.entities;
 
+import nl.saxion.game.yourgamename.collision.Collidable;
 import nl.saxion.game.yourgamename.movement.Vector2;
 
-public class Player extends Character {
+public class Player extends LivingEntity implements Collidable {
+    private final int WIDTH = 100;
+    private final int HEIGHT = 100;
     private int damage;
     private int attackSpeed;
     private int movementSpeed;
     StatSystem playerStats = new StatSystem();
     public Vector2 position = new Vector2();
 
-    public Player(String name, int maxHealth, int damage, int attackSpeed, int movementSpeed){
+    public Player(String name, int maxHealth, int damage, int attackSpeed, int movementSpeed) {
         super(name, maxHealth);
         this.damage = damage;
         this.attackSpeed = attackSpeed;
@@ -21,7 +24,7 @@ public class Player extends Character {
         this.damage = damage;
     }
 
-    public int getDamage(){
+    public int getDamage() {
         return this.damage;
     }
 
@@ -29,7 +32,7 @@ public class Player extends Character {
         this.attackSpeed = attackSpeed;
     }
 
-    public int getAttackSpeed(){
+    public int getAttackSpeed() {
         return this.attackSpeed;
     }
 
@@ -37,7 +40,43 @@ public class Player extends Character {
         this.movementSpeed = movementSpeed;
     }
 
-    public int getMovementSpeed(){
+    public int getMovementSpeed() {
         return this.movementSpeed;
     }
+
+    @Override
+    public int getX() {
+        return position.getX();
+    }
+
+    @Override
+    public void setX(int x) {
+        position.setX(x);
+    }
+
+    @Override
+    public int getY() {
+        return position.getY();
+    }
+
+    @Override
+    public void setY(int y) {
+        position.setY(y);
+    }
+
+    @Override
+    public int getWidth() {
+        return WIDTH;
+    }
+
+    @Override
+    public int getHeight() {
+        return HEIGHT;
+    }
+
+    @Override
+    public boolean isPushable() {
+        return true;
+    }
+
 }
