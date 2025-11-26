@@ -51,7 +51,7 @@ public class YourGameScreen extends ScalableGameScreen {
         WorldBorder.clampToWorldBounds(yapper, worldWidth, worldHeight);
 
 
-        for (int i = 0; i < CollisionManager.dynamic.size(); i++) {    //implement collision for pushable entity in the list
+         for (int i = 0; i < CollisionManager.dynamic.size(); i++) {    //implement collision for pushable entity in the list
             Collidable a = CollisionManager.dynamic.get(i);
 
             for (int j = i + 1; j < CollisionManager.dynamic.size(); j++) {

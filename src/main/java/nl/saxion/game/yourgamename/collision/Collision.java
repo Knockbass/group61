@@ -11,36 +11,48 @@ public class Collision {
             return;
         }
 
-        if (b.isPushable()) {//{a} is always pushable
-            boolean isABlocked = CollisionManager.isBlocked(a);
-            boolean isBBlocked = CollisionManager.isBlocked(b);
-            if (isABlocked) {
-                resolveObjectOverlap(a, CollisionManager.solidBlock);
-                resolveObjectOverlap(b, a);
-            } else if (isBBlocked) {
+        if (!b.isPushable()) {
+            resolveObjectOverlap(a, b);
+            return;
+        }
+
+        boolean isABlocked = CollisionManager.isBlocked(a);
+        boolean isBBlocked = CollisionManager.isBlocked(b);
+
+        boolean aIsPlayer = a instanceof Player;
+        boolean bIsPlayer = b instanceof Player;
+
+        if (aIsPlayer) {
+            if (isBBlocked) {
                 resolveObjectOverlap(b, CollisionManager.solidBlock);
                 resolveObjectOverlap(a, b);
-            }
 
-            if (a instanceof Player && !isBBlocked) {
+                return;
+            } else {
                 resolveObjectOverlap(b, a);
-            } else if (a instanceof Player) {
-                resolveObjectOverlap(a, b);
-            } else if (b instanceof Player && !isABlocked) {
-                resolveObjectOverlap(a, b);
-            } else if (b instanceof Player) {
-                resolveObjectOverlap(b, a);
+            }
+            return;
+        }
+
+        if (bIsPlayer) {
+            if (isABlocked) {
+                resolveObjectOverlap(a, CollisionManager.solidBlock);
+                return;
             } else {
                 resolveObjectOverlap(a, b);
             }
-        } else {        //{a} is pushable, but {b} is not
-            if (CollisionManager.isBlocked(a)) {
-                resolveObjectOverlap(a, b);
-            }
+            return;
+        }
 
-            if (a instanceof Player) {
-                resolveObjectOverlap(a, b);
-            }
+        if (isABlocked && !isBBlocked) {
+            resolveObjectOverlap(b, a);
+        } else if (isBBlocked && !isABlocked) {
+            resolveObjectOverlap(a, b);
+        } else if (isABlocked) {
+            resolveObjectOverlap(a, CollisionManager.solidBlock);
+            resolveObjectOverlap(b, CollisionManager.solidBlock);
+        } else {
+            resolveObjectOverlap(a, b);
         }
     }
 
@@ -54,6 +66,7 @@ public class Collision {
         //calculate overlap
         int overlapX = (a.getWidth() / 2 + b.getWidth() / 2) - Math.abs(aCenterX - bCenterX);
         int overlapY = (a.getHeight() / 2 + b.getHeight() / 2) - Math.abs(aCenterY - bCenterY);
+
 
         if (overlapX < overlapY) {
             if (aCenterX < bCenterX) {
