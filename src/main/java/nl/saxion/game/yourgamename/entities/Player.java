@@ -44,10 +44,6 @@ public class Player extends LivingEntity implements Collidable {
         return this.movementSpeed;
     }
 
-    public StatSystem getPlayerStats() {
-        return playerStats;
-    }
-
     @Override
     public int getX() {
         return position.getX();
@@ -81,6 +77,10 @@ public class Player extends LivingEntity implements Collidable {
     @Override
     public boolean isPushable() {
         return true;
+    }
+
+    public StatSystem getPlayerStats() {
+        return playerStats;
     }
 
 }
