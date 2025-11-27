@@ -8,6 +8,15 @@ public abstract class LivingEntity {
     public LivingEntity(String name, int maxHealth){
         this.name = name;
         this.maxHealth = maxHealth;
+        this.health = maxHealth;
+    }
+    
+    public int getHealth() {
+        return health;
+    }
+    
+    public int getMaxHealth() {
+        return maxHealth;
     }
 }
 
