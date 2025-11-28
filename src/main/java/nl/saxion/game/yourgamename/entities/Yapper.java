@@ -3,15 +3,21 @@ package nl.saxion.game.yourgamename.entities;
 import nl.saxion.game.yourgamename.collision.Collidable;
 import nl.saxion.game.yourgamename.movement.Vector2;
 
-public class Yapper extends LivingEntity implements Collidable {
+import java.util.ArrayList;
+import java.util.List;
+
+public class Yapper extends Entity implements Collidable {
     private final int WIDTH = 100;
     private final int HEIGHT = 100;
     private int damage;
     private int attackSpeed;
+    private int health;
+    private int maxHealth;
+    private boolean isPushable = true;
     public Vector2 position = new Vector2(500, 500);
 
     public Yapper(String name, int maxHealth, int damage, int attackSpeed) {
-        super(name, maxHealth);
+        super(name);
         this.damage = damage;
         this.attackSpeed = attackSpeed;
     }
@@ -64,7 +70,12 @@ public class Yapper extends LivingEntity implements Collidable {
 
     @Override
     public boolean isPushable() {
-        return true;
+        return isPushable;
+    }
+
+    @Override
+    public void setPushable(boolean pushable){
+        this.isPushable = pushable;
     }
 
 }

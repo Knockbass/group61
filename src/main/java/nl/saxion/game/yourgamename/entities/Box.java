@@ -1,15 +1,20 @@
-package nl.saxion.game.yourgamename.game_managment;
+package nl.saxion.game.yourgamename.entities;
 
 import nl.saxion.game.yourgamename.collision.Collidable;
 import nl.saxion.game.yourgamename.movement.Vector2;
 
-public class Box implements Collidable {
+import java.util.ArrayList;
+
+public class Box extends Entity implements Collidable {
     private final int WIDTH = 100;
     private final int HEIGHT = 100;
     Vector2 position = new Vector2();
+    private final boolean isPushable = false;
 
     public Box(){
+        super("Nameless");
     }
+
     public Box(int x, int y){
         setX(x);
         setY(y);
@@ -47,6 +52,11 @@ public class Box implements Collidable {
 
     @Override
     public boolean isPushable() {
-        return false;
+        return isPushable;
+    }
+
+    @Override
+    public void setPushable(boolean pushable){
+        isPushable();
     }
 }

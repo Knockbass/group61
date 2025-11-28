@@ -1,5 +1,8 @@
 package nl.saxion.game.yourgamename.entities;
 
+import nl.saxion.game.yourgamename.collision.Collidable;
+import nl.saxion.game.yourgamename.movement.Vector2;
+
 public class StatSystem {
     private int knowledge;
     private int mentalHealth;

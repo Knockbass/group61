@@ -1,5 +1,7 @@
 package nl.saxion.game.yourgamename.collision;
 
+import java.util.ArrayList;
+
 public interface Collidable {
     int getX();
     int getY();
@@ -8,4 +10,5 @@ public interface Collidable {
     int getWidth();
     int getHeight();
     boolean isPushable();
+    void setPushable(boolean pushable);
 }

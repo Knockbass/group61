@@ -1,34 +1,38 @@
 package nl.saxion.game.yourgamename.collision;
 
+import nl.saxion.game.yourgamename.entities.Player;
+import nl.saxion.game.yourgamename.game_managment.YourGameScreen;
 import nl.saxion.gameapp.GameApp;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CollisionManager {
-    public static List<Collidable> solid = new ArrayList<>();
+    public static List<Collidable> collidableEntities = new ArrayList<>();
     public static List<Collidable> dynamic = new ArrayList<>();
-    public static Collidable solidBlock;
 
     public static void addEntity(Collidable entity) {
-        if (entity.isPushable()) {
+        if (entity.isPushable()){
             dynamic.add(entity);
-        } else {
-            solid.add(entity);
         }
+        collidableEntities.add(entity);
     }
 
-    public static boolean isBlocked(Collidable a) {
-        for (Collidable b : solid) {
-            if (GameApp.rectOverlap(a.getX(), a.getY(), a.getWidth(), a.getHeight(),
-                    b.getX(), b.getY(), b.getWidth(), b.getHeight())) {
-                solidBlock = b;
-                return true;
+    public static void checkCollision() {
+        for (Collidable a : collidableEntities) {
+            for (Collidable b : collidableEntities) {
+                if (!(a == b)) {
+                    Collision.handleCollision(a, b);
+                }
             }
         }
-
-        solidBlock = null;
-        return false;
     }
 
+    public static boolean isCollidingWithPlayer(Collidable a) {
+        Player player = YourGameScreen.player;
+
+        return GameApp.rectOverlap(player.getX(), player.getY(), player.getWidth(), player.getHeight(),
+                a.getX(), a.getY(), a.getWidth(), a.getHeight());
+    }
 }
+

@@ -5,55 +5,65 @@ import nl.saxion.game.yourgamename.game_managment.YourGameScreen;
 import nl.saxion.gameapp.GameApp;
 
 public class Collision {
-    public static void isColliding(Collidable a, Collidable b) {
+    public static void handleCollision(Collidable a, Collidable b) {
         if (!GameApp.rectOverlap(a.getX(), a.getY(), a.getWidth(), a.getHeight(),     //checks if two objects are colliding
                 b.getX(), b.getY(), b.getWidth(), b.getHeight())) {
             return;
         }
 
-        if (!b.isPushable()) {
-            resolveObjectOverlap(a, b);
-            return;
-        }
-
-        boolean isABlocked = CollisionManager.isBlocked(a);
-        boolean isBBlocked = CollisionManager.isBlocked(b);
-
         boolean aIsPlayer = a instanceof Player;
         boolean bIsPlayer = b instanceof Player;
 
+        //pushable && unpushable vs player
         if (aIsPlayer) {
-            if (isBBlocked) {
-                resolveObjectOverlap(b, CollisionManager.solidBlock);
-                resolveObjectOverlap(a, b);
-
-                return;
-            } else {
+            if (b.isPushable()) {
                 resolveObjectOverlap(b, a);
-            }
-            return;
-        }
-
-        if (bIsPlayer) {
-            if (isABlocked) {
-                resolveObjectOverlap(a, CollisionManager.solidBlock);
                 return;
             } else {
+                b.setPushable(true);
                 resolveObjectOverlap(a, b);
+                return;
             }
+        }
+        if (bIsPlayer) {
+            if (a.isPushable()) {
+                resolveObjectOverlap(a, b);
+                return;
+            } else {
+                a.setPushable(true);
+                resolveObjectOverlap(b, a);
+                return;
+            }
+        }
+
+        //pushable vs pushable
+        if (CollisionManager.isCollidingWithPlayer(a)) {
+            resolveObjectOverlap(b, a);
+            return;
+        } else if (CollisionManager.isCollidingWithPlayer(b)) {
+            resolveObjectOverlap(a, b);
+        } else if (a.isPushable() && b.isPushable()) {
+            resolveObjectOverlap(b, a);
+        }
+
+        //unpushable vs unpushable
+        if (!a.isPushable() && !b.isPushable() && CollisionManager.dynamic.contains(a)) {
+            resolveObjectOverlap(a, b);
+        } else{
+            resolveObjectOverlap(b, a);
+        }
+
+        //pushable vs unpushable
+        if (a.isPushable() && !b.isPushable()) {
+            a.setPushable(false);
+            resolveObjectOverlap(a, b);
+            return;
+        } else if (!a.isPushable() && b.isPushable()) {
+            b.setPushable(false);
+            resolveObjectOverlap(b, a);
             return;
         }
 
-        if (isABlocked && !isBBlocked) {
-            resolveObjectOverlap(b, a);
-        } else if (isBBlocked && !isABlocked) {
-            resolveObjectOverlap(a, b);
-        } else if (isABlocked) {
-            resolveObjectOverlap(a, CollisionManager.solidBlock);
-            resolveObjectOverlap(b, CollisionManager.solidBlock);
-        } else {
-            resolveObjectOverlap(a, b);
-        }
     }
 
     public static void resolveObjectOverlap(Collidable a, Collidable b) {  //in this method only the coordinates of {a} are changed
