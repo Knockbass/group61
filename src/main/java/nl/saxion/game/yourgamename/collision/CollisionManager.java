@@ -1,9 +1,8 @@
 package nl.saxion.game.yourgamename.collision;
 
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import nl.saxion.game.yourgamename.entities.CombatEntity;
-import nl.saxion.game.yourgamename.entities.Entity;
 import nl.saxion.game.yourgamename.entities.Player;
-import nl.saxion.game.yourgamename.entities.Yapper;
 import nl.saxion.game.yourgamename.game_managment.YourGameScreen;
 import nl.saxion.gameapp.GameApp;
 
@@ -15,21 +14,31 @@ public class CollisionManager {
     public static List<Collidable> dynamic = new ArrayList<>();
 
     public static void addEntity(Collidable entity) {
-        if (entity.isPushable()){
+        if (entity.isPushable()) {
             dynamic.add(entity);
         }
         collidableEntities.add(entity);
     }
 
-    public static void checkCollision() {
-        for (int i = 0; i < collidableEntities.size(); i++) {
-            for (int j = i + 1; j < collidableEntities.size(); j++) { // ← j = i + 1
-                Collidable a = collidableEntities.get(i);
-                Collidable b = collidableEntities.get(j);
+    public static void checkCollision(float vL, float vR, float vT, float vB) {//left,right,top,bottom coordinates of viewport
+        List<Collidable> visibleEntities = new ArrayList<>();
+
+        for (Collidable entity : collidableEntities) {     //checks if entity is visible inside of viewport and adds it to the list if yes
+            if (!(entity.getX() + entity.getWidth() < vL || entity.getX() > vR ||
+                    entity.getY() + entity.getHeight() < vB || entity.getY() > vT)) {
+                visibleEntities.add(entity);
+            }
+        }
+
+        for (int i = 0; i < visibleEntities.size(); i++) { //checks collision of visible entities
+            for (int j = i + 1; j < visibleEntities.size(); j++) {
+                Collidable a = visibleEntities.get(i);
+                Collidable b = visibleEntities.get(j);
                 Collision.handleCollision(a, b);
             }
         }
     }
+
 
     public static boolean isCollidingWithPlayer(Collidable a) {
         Player player = YourGameScreen.player;
@@ -38,9 +47,9 @@ public class CollisionManager {
                 a.getX(), a.getY(), a.getWidth(), a.getHeight());
     }
 
-    public static boolean isCollidingWithHitbox(CombatEntity attacker, CombatEntity receiver){
-        return GameApp.rectOverlap(attacker.hitbox.x,attacker.hitbox.y, attacker.hitbox.width, attacker.hitbox.height,
-                                   receiver.position.getX(), receiver.position.getY(), receiver.entityWidth, receiver.entityHeight);
+    public static boolean isCollidingWithHitbox(CombatEntity attacker, CombatEntity receiver) {
+        return GameApp.rectOverlap(attacker.hitbox.x, attacker.hitbox.y, attacker.hitbox.width, attacker.hitbox.height,
+                receiver.position.getX(), receiver.position.getY(), receiver.entityWidth, receiver.entityHeight);
     }
 }
 

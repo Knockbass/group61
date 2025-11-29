@@ -4,13 +4,15 @@ import com.badlogic.gdx.Input;
 import nl.saxion.game.yourgamename.collision.*;
 import nl.saxion.game.yourgamename.movement.*;
 import nl.saxion.gameapp.GameApp;
-import nl.saxion.gameapp.screens.ScalableGameScreen;
+import nl.saxion.gameapp.screens.CameraControlledGameScreen;
 import nl.saxion.game.yourgamename.entities.*;
 import org.lwjgl.system.windows.INPUT;
 
-public class YourGameScreen extends ScalableGameScreen {
-    public static int worldWidth = 1280;
-    public static int worldHeight = 720;
+public class YourGameScreen extends CameraControlledGameScreen  {
+    public static int worldWidth = 3240;        //world size
+    public static int worldHeight = 2060;
+    public static int viewportWidth = 1280;     //visible screen size
+    public static int viewportHeight = 720;
 
     public static Player player;
     private Box box;
@@ -18,7 +20,7 @@ public class YourGameScreen extends ScalableGameScreen {
     private CombatSystem combatSystem;
 
     public YourGameScreen() {
-        super(worldWidth, worldHeight);
+        super(viewportWidth, viewportHeight,worldWidth, worldHeight);
     }
 
     @Override
@@ -29,24 +31,30 @@ public class YourGameScreen extends ScalableGameScreen {
 
         player = new Player("test", 100, 10,  300);
         box = new Box(200, 100);
-        enemySpawner = new EnemySpawner(worldWidth, worldHeight);
+        enemySpawner = new EnemySpawner(getWorldWidth(),getWorldHeight());
         combatSystem = new CombatSystem();
 
         CollisionManager.addEntity(player);
         CollisionManager.addEntity(box);
+
+        setCameraTargetInstantly(player.getX(),player.getY());
     }
 
     @Override
     public void render(float delta) {
-        super.render(delta);
-        GameApp.clearScreen("teal-300");
 
         // Update player movement
         PlayerMovement.checkMovementKeyPressed(player, delta);
-        WorldBorder.clampToWorldBounds(player, worldWidth, worldHeight);
+        WorldBorder.clampToWorldBounds(player, getWorldWidth(), getWorldHeight());
+
+        //update deployed screen
+        setCameraTarget(player.getX(),player.getY());
+
+        super.render(delta);
+        GameApp.clearScreen("teal-300");
 
         // Update enemy spawning
-        enemySpawner.update(delta, player);
+        enemySpawner.update(delta, player, getViewportLeft(),getViewportRight(),getViewportTop(),getViewportBottom());
 
         // Update enemy movement
         EnemyMovement.updateEnemies(enemySpawner.getEnemies(), player, delta, worldWidth, worldHeight);
@@ -65,7 +73,7 @@ public class YourGameScreen extends ScalableGameScreen {
         combatSystem.updateYapperAttack(enemySpawner.getEnemies(), player, delta);
 
         // Handle collisions
-        CollisionManager.checkCollision();
+        CollisionManager.checkCollision(getViewportLeft(),getViewportRight(),getViewportTop(),getViewportBottom());
 
         // Render all entities
         renderEntities();

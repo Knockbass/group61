@@ -6,7 +6,7 @@ import nl.saxion.game.yourgamename.entities.Yapper;
 import nl.saxion.gameapp.GameApp;
 
 public class WorldBorder {
-    public static void clampToWorldBounds(Collidable entity, int worldWidth, int worldHeight){
+    public static void clampToWorldBounds(Collidable entity, float worldWidth, float worldHeight){
         entity.setX((int) GameApp.clamp(entity.getX(), 0, worldWidth - entity.getWidth()));
         entity.setY((int) GameApp.clamp(entity.getY(), 0, worldHeight - entity.getHeight()));
     }

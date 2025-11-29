@@ -88,10 +88,12 @@ public class CombatSystem {
 
     public void applyPlayerAttack(Player player, List<Yapper> entities) {
         for (Yapper entity : entities) {
+
             if (CollisionManager.isCollidingWithHitbox(player, entity)) {
                 dealDamage(player, entity);
                 player.hasHitEnemy = true;
                 System.out.println("Yapper hp decreased: " + entity.hp);
+
                 if (entity.hp <= 0) {
                     entity.isDead = true;
                 }
