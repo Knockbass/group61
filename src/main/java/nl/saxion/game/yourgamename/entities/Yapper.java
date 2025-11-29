@@ -3,39 +3,25 @@ package nl.saxion.game.yourgamename.entities;
 import nl.saxion.game.yourgamename.collision.Collidable;
 import nl.saxion.game.yourgamename.movement.Vector2;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class Yapper extends Entity implements Collidable {
-    private final int WIDTH = 100;
-    private final int HEIGHT = 100;
-    private int damage;
-    private int attackSpeed;
-    private int health;
+public class Yapper extends CombatEntity implements Collidable {
+    public float attackCooldown;
+    public boolean attacking;
+    public float attackTimer;
     private int maxHealth;
     private boolean isPushable = true;
-    public Vector2 position = new Vector2(500, 500);
+    public boolean isDead;
 
-    public Yapper(String name, int maxHealth, int damage, int attackSpeed) {
-        super(name);
-        this.damage = damage;
-        this.attackSpeed = attackSpeed;
-    }
 
-    public void setDamage(int damage) {
-        this.damage = damage;
-    }
-
-    public void setAttackSpeed(int attackSpeed) {
-        this.attackSpeed = attackSpeed;
-    }
-
-    public int getDamage() {
-        return this.damage;
-    }
-
-    public int getAttackSpeed() {
-        return this.attackSpeed;
+    public Yapper(String name, int maxHealth, int damage, int attackCooldown) {
+        super.name = name;
+        super.entityWidth = 100;
+        super.entityHeight = 100;
+        super.position = new Vector2(500, 500);
+        super.hp = maxHealth;
+        this.attackDamage = damage;
+        this.isDead = false;
+        this.attackTimer = 0f;
+        this.attackCooldown = attackCooldown;
     }
 
     @Override
@@ -60,12 +46,12 @@ public class Yapper extends Entity implements Collidable {
 
     @Override
     public int getWidth() {
-        return WIDTH;
+        return entityWidth;
     }
 
     @Override
     public int getHeight() {
-        return HEIGHT;
+        return entityHeight;
     }
 
     @Override
@@ -74,7 +60,7 @@ public class Yapper extends Entity implements Collidable {
     }
 
     @Override
-    public void setPushable(boolean pushable){
+    public void setPushable(boolean pushable) {
         this.isPushable = pushable;
     }
 

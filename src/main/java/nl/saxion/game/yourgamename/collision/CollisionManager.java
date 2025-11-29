@@ -1,6 +1,9 @@
 package nl.saxion.game.yourgamename.collision;
 
+import nl.saxion.game.yourgamename.entities.CombatEntity;
+import nl.saxion.game.yourgamename.entities.Entity;
 import nl.saxion.game.yourgamename.entities.Player;
+import nl.saxion.game.yourgamename.entities.Yapper;
 import nl.saxion.game.yourgamename.game_managment.YourGameScreen;
 import nl.saxion.gameapp.GameApp;
 
@@ -19,11 +22,11 @@ public class CollisionManager {
     }
 
     public static void checkCollision() {
-        for (Collidable a : collidableEntities) {
-            for (Collidable b : collidableEntities) {
-                if (!(a == b)) {
-                    Collision.handleCollision(a, b);
-                }
+        for (int i = 0; i < collidableEntities.size(); i++) {
+            for (int j = i + 1; j < collidableEntities.size(); j++) { // ← j = i + 1
+                Collidable a = collidableEntities.get(i);
+                Collidable b = collidableEntities.get(j);
+                Collision.handleCollision(a, b);
             }
         }
     }
@@ -33,6 +36,11 @@ public class CollisionManager {
 
         return GameApp.rectOverlap(player.getX(), player.getY(), player.getWidth(), player.getHeight(),
                 a.getX(), a.getY(), a.getWidth(), a.getHeight());
+    }
+
+    public static boolean isCollidingWithHitbox(CombatEntity attacker, CombatEntity receiver){
+        return GameApp.rectOverlap(attacker.hitbox.x,attacker.hitbox.y, attacker.hitbox.width, attacker.hitbox.height,
+                                   receiver.position.getX(), receiver.position.getY(), receiver.entityWidth, receiver.entityHeight);
     }
 }
 

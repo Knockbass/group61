@@ -2,41 +2,39 @@ package nl.saxion.game.yourgamename.entities;
 
 import nl.saxion.game.yourgamename.collision.Collidable;
 import nl.saxion.game.yourgamename.movement.Vector2;
+import nl.saxion.gameapp.GameApp;
 
-public class Player extends Entity implements Collidable {
-    private final int WIDTH = 100;
-    private final int HEIGHT = 100;
-    private int damage;
-    private int attackSpeed;
+public class Player extends CombatEntity implements Collidable {
     private int movementSpeed;
-    private int health;
-    private int maxHealth;
+    public boolean attacking;
+    public float attackTimer, attackDuration;
+    public Direction facing;
+    private int maxHP;
     private boolean isPushable = true;
+    public boolean hasHitEnemy;
     StatSystem playerStats = new StatSystem();
-    public Vector2 position = new Vector2();
 
-    public Player(String name, int maxHealth, int damage, int attackSpeed, int movementSpeed) {
-        super(name);
-        this.damage = damage;
-        this.attackSpeed = attackSpeed;
+    public Player(String name, int maxHealth, int damage, int movementSpeed) {
+        super.name = name;
+        super.entityWidth = 100;
+        super.entityHeight = 100;
+        super.position = new Vector2();
+        super.hitbox = new Rectangle();
+        this.facing = Direction.RIGHT;
+        this.attackDamage = damage;
+        this.attackTimer = 0f;          //can be used as duration of the animation of attack
         this.movementSpeed = movementSpeed;
-        this.health = maxHealth;
+        this.hp = maxHealth;
+        this.attackDuration = 0.8f;     //set the cooldown for player attack
+        this.hasHitEnemy = false;
     }
 
-    public void setDamage(int damage) {
-        this.damage = damage;
+    public void setAttackDamage(int attackDamage) {
+        this.attackDamage = attackDamage;
     }
 
-    public int getDamage() {
-        return this.damage;
-    }
-
-    public void setAttackSpeed(int attackSpeed) {
-        this.attackSpeed = attackSpeed;
-    }
-
-    public int getAttackSpeed() {
-        return this.attackSpeed;
+    public int getAttackDamage() {
+        return this.attackDamage;
     }
 
     public void setMovementSpeed(int movementSpeed) {
@@ -69,12 +67,12 @@ public class Player extends Entity implements Collidable {
 
     @Override
     public int getWidth() {
-        return WIDTH;
+        return entityWidth;
     }
 
     @Override
     public int getHeight() {
-        return HEIGHT;
+        return entityHeight;
     }
 
     @Override
@@ -83,11 +81,13 @@ public class Player extends Entity implements Collidable {
     }
 
     @Override
-    public void setPushable(boolean pushable){
+    public void setPushable(boolean pushable) {
         this.isPushable = pushable;
     }
 
     public StatSystem getPlayerStats() {
         return playerStats;
     }
+
 }
+

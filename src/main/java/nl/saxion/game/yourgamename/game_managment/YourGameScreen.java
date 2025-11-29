@@ -1,10 +1,12 @@
 package nl.saxion.game.yourgamename.game_managment;
 
+import com.badlogic.gdx.Input;
 import nl.saxion.game.yourgamename.collision.*;
 import nl.saxion.game.yourgamename.movement.*;
 import nl.saxion.gameapp.GameApp;
 import nl.saxion.gameapp.screens.ScalableGameScreen;
 import nl.saxion.game.yourgamename.entities.*;
+import org.lwjgl.system.windows.INPUT;
 
 public class YourGameScreen extends ScalableGameScreen {
     public static int worldWidth = 1280;
@@ -13,6 +15,7 @@ public class YourGameScreen extends ScalableGameScreen {
     public static Player player;
     private Box box;
     private EnemySpawner enemySpawner;
+    private CombatSystem combatSystem;
 
     public YourGameScreen() {
         super(worldWidth, worldHeight);
@@ -24,9 +27,10 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.addTexture("enemy", "textures/crocodile.png");
         GameApp.addTexture("box", "textures/rhino.png");
 
-        player = new Player("test", 100, 10, 5, 300);
+        player = new Player("test", 100, 10,  300);
         box = new Box(200, 100);
         enemySpawner = new EnemySpawner(worldWidth, worldHeight);
+        combatSystem = new CombatSystem();
 
         CollisionManager.addEntity(player);
         CollisionManager.addEntity(box);
@@ -46,6 +50,19 @@ public class YourGameScreen extends ScalableGameScreen {
 
         // Update enemy movement
         EnemyMovement.updateEnemies(enemySpawner.getEnemies(), player, delta, worldWidth, worldHeight);
+
+        // Render attack
+        if(GameApp.isButtonJustPressed(Input.Buttons.LEFT) && !player.attacking){
+            combatSystem.startAttack(player);
+        }
+
+        if(player.attacking && !player.hasHitEnemy){
+            combatSystem.applyPlayerAttack(player, enemySpawner.getEnemies());
+            enemySpawner.deleteDeadEnemies();
+        }
+
+        combatSystem.updatePlayerAttack(player, delta);
+        combatSystem.updateYapperAttack(enemySpawner.getEnemies(), player, delta);
 
         // Handle collisions
         CollisionManager.checkCollision();

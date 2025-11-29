@@ -57,6 +57,5 @@ public class Box extends Entity implements Collidable {
 
     @Override
     public void setPushable(boolean pushable){
-        isPushable();
     }
 }
