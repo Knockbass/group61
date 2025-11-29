@@ -37,7 +37,7 @@ public class CombatSystem {
 
                     if (touchingPlayer) {
                         dealDamage(yapper, player);
-                        System.out.println("Player hp decreased: " + player.hp);
+                        System.out.println("Player hp decreased: " + player.accessStatSystem().getHP());
                     }
                     yapper.attacking = false;
                     yapper.attackTimer = 0;
@@ -92,9 +92,9 @@ public class CombatSystem {
             if (CollisionManager.isCollidingWithHitbox(player, entity)) {
                 dealDamage(player, entity);
                 player.hasHitEnemy = true;
-                System.out.println("Yapper hp decreased: " + entity.hp);
+                System.out.println("Yapper hp decreased: " + entity.getHp());
 
-                if (entity.hp <= 0) {
+                if (entity.getHp() <= 0) {
                     entity.isDead = true;
                 }
             }
@@ -103,6 +103,10 @@ public class CombatSystem {
     }
 
     public void dealDamage(CombatEntity damager, CombatEntity receiver) {
-        receiver.hp -= damager.attackDamage;
+        if(receiver instanceof Player){
+            ((Player) receiver).accessStatSystem().setHP(((Player) receiver).accessStatSystem().getHP() - damager.getAttackDamage());
+        } else {
+            receiver.setHp(receiver.getHp() - ((Player) damager).accessStatSystem().getKnowldge()); //knowledge is used as a damage for player
+        }
     }
 }

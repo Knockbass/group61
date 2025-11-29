@@ -1,40 +1,29 @@
 package nl.saxion.game.yourgamename.entities;
 
 import nl.saxion.game.yourgamename.collision.Collidable;
+import nl.saxion.game.yourgamename.game_managment.StatSystem;
 import nl.saxion.game.yourgamename.movement.Vector2;
-import nl.saxion.gameapp.GameApp;
 
 public class Player extends CombatEntity implements Collidable {
     private int movementSpeed;
     public boolean attacking;
     public float attackTimer, attackDuration;
     public Direction facing;
-    private int maxHP;
     private boolean isPushable = true;
     public boolean hasHitEnemy;
-    StatSystem playerStats = new StatSystem();
+    private StatSystem statSystem = new StatSystem();
 
-    public Player(String name, int maxHealth, int damage, int movementSpeed) {
+    public Player(String name, int movementSpeed) {
         super.name = name;
         super.entityWidth = 100;
         super.entityHeight = 100;
         super.position = new Vector2();
         super.hitbox = new Rectangle();
         this.facing = Direction.RIGHT;
-        this.attackDamage = damage;
         this.attackTimer = 0f;          //can be used as duration of the animation of attack
         this.movementSpeed = movementSpeed;
-        this.hp = maxHealth;
         this.attackDuration = 0.8f;     //set the cooldown for player attack
         this.hasHitEnemy = false;
-    }
-
-    public void setAttackDamage(int attackDamage) {
-        this.attackDamage = attackDamage;
-    }
-
-    public int getAttackDamage() {
-        return this.attackDamage;
     }
 
     public void setMovementSpeed(int movementSpeed) {
@@ -85,9 +74,23 @@ public class Player extends CombatEntity implements Collidable {
         this.isPushable = pushable;
     }
 
-    public StatSystem getPlayerStats() {
-        return playerStats;
+    @Override
+    public int getHp(){
+        return statSystem.getHP();
     }
 
+    @Override
+    public void setHp(int hp){
+        this.statSystem.setHP(hp);
+    }
+
+    @Override
+    public int getAttackDamage() {
+        return this.statSystem.getKnowldge();
+    }
+
+    public StatSystem accessStatSystem() {
+        return statSystem;
+    }
 }
 

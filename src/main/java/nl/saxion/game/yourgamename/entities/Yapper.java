@@ -17,8 +17,8 @@ public class Yapper extends CombatEntity implements Collidable {
         super.entityWidth = 100;
         super.entityHeight = 100;
         super.position = new Vector2(500, 500);
-        super.hp = maxHealth;
-        this.attackDamage = damage;
+        super.setHp(maxHealth);
+        super.setAttackDamage(damage);
         this.isDead = false;
         this.attackTimer = 0f;
         this.attackCooldown = attackCooldown;

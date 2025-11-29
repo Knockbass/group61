@@ -46,7 +46,7 @@ public class EnemySpawner {
     }
 
     private float calculateSpawnInterval(Player player) {
-        int mentalHealth = player.getPlayerStats().getMentalHealth();
+        int mentalHealth = player.accessStatSystem().getMentalHealth();
 
         // Mental health ranges from 0-100
         // Map: 0 mental health = MIN_SPAWN_INTERVAL, 100 mental health = MAX_SPAWN_INTERVAL
@@ -195,7 +195,17 @@ public class EnemySpawner {
     public void removeEnemyOutsideOfViewport(float vL, float vR, float vT, float vB) {
         int margin = 150; //Extra distance outside of viewport
 
-        enemies.removeIf(yapper -> yapper.getX() + yapper.getWidth() + margin < vL || yapper.getX() - margin > vR ||
-                yapper.getY() + yapper.getHeight() + margin < vB || yapper.getY() - margin > vT);
+        Iterator<Yapper> iterator = enemies.iterator();
+        while (iterator.hasNext()) {
+            Yapper yapper = iterator.next();
+
+            if (yapper.getX() + yapper.getWidth() + margin < vL || yapper.getX() - margin > vR ||
+                    yapper.getY() + yapper.getHeight() + margin < vB || yapper.getY() - margin > vT) {
+
+                CollisionManager.collidableEntities.remove(yapper);
+                CollisionManager.dynamic.remove(yapper);
+                iterator.remove();
+            }
+        }
     }
 }

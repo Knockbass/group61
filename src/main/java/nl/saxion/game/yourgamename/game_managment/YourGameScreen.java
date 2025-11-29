@@ -6,7 +6,6 @@ import nl.saxion.game.yourgamename.movement.*;
 import nl.saxion.gameapp.GameApp;
 import nl.saxion.gameapp.screens.CameraControlledGameScreen;
 import nl.saxion.game.yourgamename.entities.*;
-import org.lwjgl.system.windows.INPUT;
 
 public class YourGameScreen extends CameraControlledGameScreen  {
     public static int worldWidth = 3240;        //world size
@@ -29,7 +28,7 @@ public class YourGameScreen extends CameraControlledGameScreen  {
         GameApp.addTexture("enemy", "textures/crocodile.png");
         GameApp.addTexture("box", "textures/rhino.png");
 
-        player = new Player("test", 100, 10,  300);
+        player = new Player("test",    300);
         box = new Box(200, 100);
         enemySpawner = new EnemySpawner(getWorldWidth(),getWorldHeight());
         combatSystem = new CombatSystem();
@@ -67,6 +66,20 @@ public class YourGameScreen extends CameraControlledGameScreen  {
         if(player.attacking && !player.hasHitEnemy){
             combatSystem.applyPlayerAttack(player, enemySpawner.getEnemies());
             enemySpawner.deleteDeadEnemies();
+        }
+
+        if(GameApp.isKeyJustPressed(Input.Keys.E)){
+            System.out.println("MH, E and K before sleeping: " + player.accessStatSystem().getMentalHealth() + " " + player.accessStatSystem().getEnergy() + " " + player.accessStatSystem().getKnowldge());
+            player.accessStatSystem().sleep();
+            System.out.println("MH, E and K after sleeping: " + player.accessStatSystem().getMentalHealth() + " " + player.accessStatSystem().getEnergy() + " " + player.accessStatSystem().getKnowldge());
+            System.out.println();
+            System.out.println("MH, E and K before studying: " + player.accessStatSystem().getMentalHealth() + " " + player.accessStatSystem().getEnergy() + " " + player.accessStatSystem().getKnowldge());
+            player.accessStatSystem().study();
+            System.out.println("MH, E and K after studying: " + player.accessStatSystem().getMentalHealth() + " " + player.accessStatSystem().getEnergy() + " " + player.accessStatSystem().getKnowldge());
+            System.out.println();
+            System.out.println("MH, E, K and Hp before drinking: " + player.accessStatSystem().getMentalHealth() + " " + player.accessStatSystem().getEnergy() + " " + player.accessStatSystem().getKnowldge() + " " + player.accessStatSystem().getHP());
+            player.accessStatSystem().dringBeer();
+            System.out.println("MH, E, K and Hp after drinking: " + player.accessStatSystem().getMentalHealth() + " " + player.accessStatSystem().getEnergy() + " " + player.accessStatSystem().getKnowldge() + " " + player.accessStatSystem().getHP());
         }
 
         combatSystem.updatePlayerAttack(player, delta);
