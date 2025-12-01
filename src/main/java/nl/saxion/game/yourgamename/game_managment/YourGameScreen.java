@@ -24,6 +24,9 @@ public class YourGameScreen extends CameraControlledGameScreen  {
 
     @Override
     public void show() {
+        // Enable the built-in HUD
+        enableHUD(viewportWidth, viewportHeight);
+        
         GameApp.addTexture("player", "textures/bear.png");
         GameApp.addTexture("enemy", "textures/crocodile.png");
         GameApp.addTexture("box", "textures/rhino.png");
@@ -69,17 +72,9 @@ public class YourGameScreen extends CameraControlledGameScreen  {
         }
 
         if(GameApp.isKeyJustPressed(Input.Keys.E)){
-            System.out.println("MH, E and K before sleeping: " + player.accessStatSystem().getMentalHealth() + " " + player.accessStatSystem().getEnergy() + " " + player.accessStatSystem().getKnowldge());
             player.accessStatSystem().sleep();
-            System.out.println("MH, E and K after sleeping: " + player.accessStatSystem().getMentalHealth() + " " + player.accessStatSystem().getEnergy() + " " + player.accessStatSystem().getKnowldge());
-            System.out.println();
-            System.out.println("MH, E and K before studying: " + player.accessStatSystem().getMentalHealth() + " " + player.accessStatSystem().getEnergy() + " " + player.accessStatSystem().getKnowldge());
             player.accessStatSystem().study();
-            System.out.println("MH, E and K after studying: " + player.accessStatSystem().getMentalHealth() + " " + player.accessStatSystem().getEnergy() + " " + player.accessStatSystem().getKnowldge());
-            System.out.println();
-            System.out.println("MH, E, K and Hp before drinking: " + player.accessStatSystem().getMentalHealth() + " " + player.accessStatSystem().getEnergy() + " " + player.accessStatSystem().getKnowldge() + " " + player.accessStatSystem().getHP());
             player.accessStatSystem().dringBeer();
-            System.out.println("MH, E, K and Hp after drinking: " + player.accessStatSystem().getMentalHealth() + " " + player.accessStatSystem().getEnergy() + " " + player.accessStatSystem().getKnowldge() + " " + player.accessStatSystem().getHP());
         }
 
         combatSystem.updatePlayerAttack(player, delta);
@@ -90,6 +85,10 @@ public class YourGameScreen extends CameraControlledGameScreen  {
 
         // Render all entities
         renderEntities();
+        
+        // Switch to HUD rendering and display stats
+        switchToHudRendering();
+        DisplayStats.render(player, getHUDWidth(), getHUDHeight());
     }
     private void renderEntities() {
         GameApp.startSpriteRendering();

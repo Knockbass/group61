@@ -14,6 +14,10 @@ public class Stat {
         return this.currentValue;
     }
 
+    public int getBaseValue(){
+        return this.baseValue;
+    }
+
     public void setCurrentValue(int value){
         this.currentValue = value;
     }

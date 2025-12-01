@@ -65,4 +65,20 @@ public class StatSystem {
     public void setHP(int hp){
         this.hp.setCurrentValue(hp);
     }
+
+    public int getMaxHP(){
+        return this.hp.getBaseValue();
+    }
+
+    public int getMaxMentalHealth(){
+        return this.mentalHealth.getBaseValue();
+    }
+
+    public int getMaxEnergy(){
+        return this.energy.getBaseValue();
+    }
+
+    public int getMaxKnowledge(){
+        return this.knowledge.getBaseValue();
+    }
 }
