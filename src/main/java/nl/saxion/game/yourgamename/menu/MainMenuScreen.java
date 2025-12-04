@@ -54,7 +54,7 @@ public class MainMenuScreen extends ScalableGameScreen {
         GameApp.enableTransparency();
         GameApp.addFont("pixel", "fonts/Jersey10-Regular.ttf", 200);
         GameApp.addFont("pixel2", "fonts/Jersey10-Regular.ttf", 100);
-        GameApp.addTexture("Background", "textures/bg2.png");
+        GameApp.addTexture("Background", "textures/bg3.png");
         GameApp.addMusic("BGMusic1", "audio/morning-traffic-60458.mp3");
         GameApp.addMusic("BGMusic2", "audio/urban-morning-birds-4-am-soundscape-366500.mp3");
         GameApp.addSound("blimp", "audio/blimp.mp3");
@@ -68,6 +68,8 @@ public class MainMenuScreen extends ScalableGameScreen {
         GameApp.addInterpolator("fadeOut3", width - animEnd2, width + animStart2, 4f, "fade");
         GameApp.addInterpolator("fadeOut4", width - animEnd2, width + animStart2, 5f, "fade");
         GameApp.addInterpolator("arrow", width + animStart2, width - animArrow, 1f, "fade");
+        GameApp.addSpriteSheet("sleepingCharacter", "textures/testanim.png", 1317, 816);
+        GameApp.addAnimationFromSpritesheet("sleepingAnim", "sleepingCharacter", 0.7f, true);
     }
 
     @Override
@@ -97,13 +99,15 @@ public class MainMenuScreen extends ScalableGameScreen {
             GameApp.switchToFullscreen();
             fullScreen = true;
         } else if (GameApp.isKeyJustPressed(Input.Keys.F11) && fullScreen) {
-            GameApp.switchToWindowedMode(1728, 1088);
+            GameApp.switchToWindowedMode(1920, 1080);
             fullScreen = false;
         }
 
         if (!choiceMade) {
             GameApp.startSpriteRendering();
             GameApp.drawTexture("Background", 0, 0, width, height);
+            GameApp.updateAnimation("sleepingAnim");
+            GameApp.drawAnimation("sleepingAnim", 0, +110, 900, 500);
             GameApp.drawTextCentered("pixel", "SURVIVE", textPos1, textSurvive, "orange-100");
             GameApp.drawTextCentered("pixel2", "the SEMESTER", textTheSemester, textPos2, "orange-100");
             GameApp.drawTextCentered("pixel2", "Start your journey", textStartYJ, textPos3, "orange-100");
@@ -128,6 +132,8 @@ public class MainMenuScreen extends ScalableGameScreen {
                 }
             }
             if (whichChoice == 2) {
+                GameApp.updateAnimation("sleepingAnim");
+                GameApp.drawAnimation("sleepingAnim", 0, +110, 900, 500);
                 if (GameApp.isInterpolatorFinished("fadeOut4")) {
                     GameApp.quit();
                 }
@@ -212,6 +218,7 @@ public class MainMenuScreen extends ScalableGameScreen {
         GameApp.disposeInterpolator("fadeOut3");
         GameApp.disposeInterpolator("fadeOut4");
         GameApp.disposeInterpolator("arrow");
+        GameApp.disposeSpritesheet("sleepingCharacter");
         GameApp.disposeFont("pixel");
         GameApp.disposeFont("pixel2");
         GameApp.disposeTexture("Background");
