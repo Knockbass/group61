@@ -8,7 +8,7 @@ public class StatSystem {
     private Stat money = new Stat(0);           //used to buy beer
     private Stat energy = new Stat(100);        //idk
     private Stat hp = new Stat(100);            //player's hp
-
+    private Stat beerCount = new Stat(1);
 
     //increase mental health and energy
     public void sleep(){
@@ -29,13 +29,18 @@ public class StatSystem {
 
     //increase mentalHealth, Health, and energy, decrease knowledge
     public void dringBeer(){
+        if (this.beerCount.get() > 0){
+        this.beerCount.setCurrentValue((new StatModifier(StatModifier.Type.ADDING,-1).getModifiedValue(beerCount)));
         this.knowledge.setCurrentValue(new StatModifier(StatModifier.Type.ADDING, -5).getModifiedValue(knowledge));
         this.mentalHealth.setCurrentValue(new StatModifier(StatModifier.Type.ADDING, +20).getModifiedValue(mentalHealth));
         this.energy.setCurrentValue(new StatModifier(StatModifier.Type.ADDING, +20).getModifiedValue(energy));
         this.hp.setCurrentValue(new StatModifier(StatModifier.Type.ADDING, +25).getModifiedValue(hp));
         mentalHealth.applyMaxValueBound();
         energy.applyMaxValueBound();
-        hp.applyMaxValueBound();
+        hp.applyMaxValueBound();}
+        else {
+            // add err msg for you don't have beer !
+        }
     }
 
     public int getMentalHealth() {

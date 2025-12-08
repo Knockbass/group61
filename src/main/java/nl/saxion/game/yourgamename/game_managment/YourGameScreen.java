@@ -72,8 +72,8 @@ public class YourGameScreen extends CameraControlledGameScreen  {
         }
 
         if(GameApp.isKeyJustPressed(Input.Keys.E)){
-            player.accessStatSystem().sleep();
-            player.accessStatSystem().study();
+         //   player.accessStatSystem().sleep();
+           // player.accessStatSystem().study();
             player.accessStatSystem().dringBeer();
         }
 
