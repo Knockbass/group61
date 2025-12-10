@@ -11,7 +11,7 @@ public class YourGameScreen extends CameraControlledGameScreen  {
     public static int worldWidth = 3240;        //world size
     public static int worldHeight = 2060;
     public static int viewportWidth = 1280;     //visible screen size
-    public static int viewportHeight = 720;
+    public static int viewportHeight = 720; 
 
     public static Player player;
     private Box box;
