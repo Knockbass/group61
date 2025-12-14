@@ -20,6 +20,8 @@ public class YourGameScreen extends BaseGameScreen {
     private WorldMap world;
     private EnemySpawner enemySpawner;
     private CombatSystem combatSystem;
+    private NPCSystem npcSystem;
+    private EventInteractionSystem eventSystem;
 
     public YourGameScreen() {
         super(viewportWidth, viewportHeight, worldWidth, worldHeight);
@@ -33,10 +35,25 @@ public class YourGameScreen extends BaseGameScreen {
         CollisionManager.addMapObjects(collisionObjects);
 
         GameApp.addTexture("player", "textures/player.png");
+        // Add enemy texture (using bear as placeholder - replace with enemy.png when available)
+        GameApp.addTexture("enemy", "textures/bear.png");
+        GameApp.addFont("hud", "fonts/basic.ttf", 20, true);
+        GameApp.addFont("default", "fonts/basic.ttf", 18);
 
         player = new Player("player", 125);
         enemySpawner = new EnemySpawner(worldWidth, worldHeight);
         combatSystem = new CombatSystem();
+        npcSystem = new NPCSystem(player);
+        eventSystem = new EventInteractionSystem(player);
+
+        // Load NPCs from Events object layer
+        MapObjects eventObjects = world.getObjectLayer("Events").getObjects();
+        npcSystem.loadNPCsFromMap(eventObjects);
+        // Load event areas (like UniEntrance) from Events object layer
+        eventSystem.loadEventsFromMap(eventObjects);
+        // Load YapperSpawn areas from Spawns object layer
+        MapObjects spawnObjects = world.getObjectLayer("Spawns").getObjects();
+        enemySpawner.loadSpawnAreasFromMap(spawnObjects);
 
         CollisionManager.addEntity(player);
         setCameraTargetInstantly(player.getX(), player.getY());
@@ -61,7 +78,12 @@ public class YourGameScreen extends BaseGameScreen {
         renderEntities();
         //render map layers above entities
         world.getRenderer().render(world.getLayersAbovePlayer());
+        //render interaction prompts on top of everything (trees, blocks, etc.)
+        renderInteractionPrompts();
 
+
+        // Update NPC system (for clearing completed quest display)
+        npcSystem.update(delta);
 
         // Update enemy spawning
         enemySpawner.update(delta, player, getViewportLeft(), getViewportRight(), getViewportTop(), getViewportBottom());
@@ -80,9 +102,16 @@ public class YourGameScreen extends BaseGameScreen {
         }
 
         if (GameApp.isKeyJustPressed(Input.Keys.E)) {
-            player.accessStatSystem().sleep();
-            player.accessStatSystem().study();
-            player.accessStatSystem().dringBeer();
+            // Check for NPC interaction first (within 50 pixel range)
+            if (!npcSystem.interactWithNearbyNPC(50f)) {
+                // Check for event interaction (like UniEntrance)
+                if (!eventSystem.interactWithNearbyEvent(50f)) {
+                    // If no NPC or event nearby, use default E key actions
+                    player.accessStatSystem().sleep();
+                    player.accessStatSystem().study();
+                    player.accessStatSystem().dringBeer();
+                }
+            }
         }
 
         combatSystem.updatePlayerAttack(player, delta);
@@ -91,18 +120,38 @@ public class YourGameScreen extends BaseGameScreen {
         // Handle collisions
         CollisionManager.checkCollision(getViewportLeft(),getViewportRight(),getViewportTop(),getViewportBottom());
 
-        // DisplayStats.render(player, getHUDWidth(), getHUDHeight());
+        // Render HUD (stats display) - render after everything else so it's on top
+        // Use screen dimensions for pixel-perfect rendering
+        DisplayStats.render(player, getScreenWidth(), getScreenHeight(), getCamera());
+        
+        // Render quest progress on right side if quest is active or completed
+        Quest activeQuest = npcSystem.getActiveQuest();
+        Quest completedQuest = npcSystem.getCompletedQuest();
+        if (activeQuest != null || completedQuest != null) {
+            DisplayStats.renderQuestProgress(activeQuest, completedQuest, player, getScreenWidth(), getScreenHeight(), getCamera());
+        }
     }
 
     private void renderEntities() {
         GameApp.startSpriteRendering();
         GameApp.drawTexture("player",player.getX(), player.getY(), player.getWidth(), player.getHeight());
 
-        //GameApp.drawTexture("player", player.position.getX(), player.position.getY(), player.getWidth(), player.getHeight());
+        GameApp.drawTexture("player", player.position.getX(), player.position.getY(), player.getWidth(), player.getHeight());
 
-        //for (Yapper enemy : enemySpawner.getEnemies()) {
-        //    GameApp.drawTexture("enemy", enemy.position.getX(), enemy.position.getY(), enemy.getWidth(), enemy.getHeight());
-        // }
+        for (Yapper enemy : enemySpawner.getEnemies()) {
+           GameApp.drawTexture("enemy", enemy.position.getX(), enemy.position.getY(), enemy.getWidth(), enemy.getHeight());
+         }
+        
+        GameApp.endSpriteRendering();
+    }
+
+    private void renderInteractionPrompts() {
+        // Render interaction prompts in a separate sprite batch so they appear on top of all map layers
+        GameApp.startSpriteRendering();
+        // Render NPC interaction prompt
+        npcSystem.renderInteractionPrompt(50f);
+        // Render event interaction prompt (like UniEntrance)
+        eventSystem.renderInteractionPrompt(50f);
         GameApp.endSpriteRendering();
     }
 

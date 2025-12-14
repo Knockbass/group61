@@ -109,4 +109,20 @@ public abstract class BaseGameScreen extends GameScreen {
     public float getViewportTop() {
         return camera.position.y + (viewport.getWorldHeight() / 2f) * camera.zoom;
     }
+
+    public float getHUDWidth() {
+        return viewport.getWorldWidth();
+    }
+
+    public float getHUDHeight() {
+        return viewport.getWorldHeight();
+    }
+
+    public float getScreenWidth() {
+        return com.badlogic.gdx.Gdx.graphics.getWidth();
+    }
+
+    public float getScreenHeight() {
+        return com.badlogic.gdx.Gdx.graphics.getHeight();
+    }
 }

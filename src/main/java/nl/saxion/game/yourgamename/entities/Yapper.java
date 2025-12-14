@@ -14,8 +14,8 @@ public class Yapper extends CombatEntity implements Collidable {
 
     public Yapper(String name, int maxHealth, int damage, int attackCooldown) {
         super.name = name;
-        super.entityWidth = 100;
-        super.entityHeight = 100;
+        super.entityWidth = 24; // Same as player
+        super.entityHeight = 32; // Same as player
         super.position = new Vector2(500, 500);
         super.setHp(maxHealth);
         super.setAttackDamage(damage);

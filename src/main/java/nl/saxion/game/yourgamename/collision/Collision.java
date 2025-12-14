@@ -1,5 +1,6 @@
 package nl.saxion.game.yourgamename.collision;
 
+import nl.saxion.game.yourgamename.entities.Box;
 import nl.saxion.game.yourgamename.entities.Player;
 import nl.saxion.game.yourgamename.game_managment.YourGameScreen;
 import nl.saxion.gameapp.GameApp;
@@ -39,37 +40,64 @@ public class Collision {
             return;
         }
 
+        //pushable vs unpushable - only move the pushable entity, never move static objects (Box)
+        // This check must come FIRST to prevent static objects from being moved
+        if (a.isPushable() && !b.isPushable()) {
+            // Move pushable entity (a) away from static object (b)
+            // Never move Box objects (static collision)
+            if (!(b instanceof Box)) {
+                resolveObjectOverlap(a, b);
+            } else {
+                // Box is static - only move the pushable entity
+                resolveObjectOverlap(a, b);
+            }
+            return;
+        } else if (!a.isPushable() && b.isPushable()) {
+            // Move pushable entity (b) away from static object (a)
+            // Never move Box objects (static collision)
+            if (!(a instanceof Box)) {
+                resolveObjectOverlap(b, a);
+            } else {
+                // Box is static - only move the pushable entity
+                resolveObjectOverlap(b, a);
+            }
+            return;
+        }
+
         //pushable vs pushable
         if (CollisionManager.isCollidingWithPlayer(a)) {
             resolveObjectOverlap(b, a);
             return;
         } else if (CollisionManager.isCollidingWithPlayer(b)) {
             resolveObjectOverlap(a, b);
+            return;
         } else if (a.isPushable() && b.isPushable()) {
             resolveObjectOverlap(b, a);
-        }
-
-        //unpushable vs unpushable
-        if (!a.isPushable() && !b.isPushable() && CollisionManager.dynamic.contains(a)) {
-            resolveObjectOverlap(a, b);
-        } else {
-            resolveObjectOverlap(b, a);
-        }
-
-        //pushable vs unpushable
-        if (a.isPushable() && !b.isPushable()) {
-            a.setPushable(false);
-            resolveObjectOverlap(a, b);
             return;
-        } else if (!a.isPushable() && b.isPushable()) {
-            b.setPushable(false);
-            resolveObjectOverlap(b, a);
+        }
+
+        //unpushable vs unpushable - only move dynamic entities, never move static Box objects
+        if (!a.isPushable() && !b.isPushable()) {
+            if (a instanceof Box && b instanceof Box) {
+                // Both are static Boxes - don't move either
+                return;
+            }
+            if (CollisionManager.dynamic.contains(a) && !(a instanceof Box)) {
+                resolveObjectOverlap(a, b);
+            } else if (CollisionManager.dynamic.contains(b) && !(b instanceof Box)) {
+                resolveObjectOverlap(b, a);
+            }
             return;
         }
 
     }
 
     public static void resolveObjectOverlap(Collidable a, Collidable b) {  //in this method only the coordinates of {a} are changed
+        // Never move Box objects (static collision objects)
+        if (a instanceof Box) {
+            return; // Box is static and should never be moved
+        }
+        
         //finds centers of objects
         int aCenterX = a.getX() + a.getWidth() / 2;
         int aCenterY = a.getY() + a.getHeight() / 2;

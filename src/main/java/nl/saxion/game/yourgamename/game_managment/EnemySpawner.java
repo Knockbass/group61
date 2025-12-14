@@ -1,5 +1,9 @@
 package nl.saxion.game.yourgamename.game_managment;
 
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.math.Rectangle;
 import nl.saxion.game.yourgamename.collision.CollisionManager;
 import nl.saxion.game.yourgamename.entities.Player;
 import nl.saxion.game.yourgamename.entities.Yapper;
@@ -13,11 +17,12 @@ public class EnemySpawner {
     private static final float MIN_SPAWN_INTERVAL = 0.5f; // Fastest spawn rate (low mental health)
     private static final float MAX_SPAWN_INTERVAL = 8.0f; // Slowest spawn rate (high mental health)
 
-    private static final int MAX_ENEMIES = 0; // Maximum number of enemies alive at once
-    private static final int MIN_DISTANCE_FROM_PLAYER = 200; // Minimum spawn distance from player
+    private static final int MAX_ENEMIES = 2; // Maximum number of enemies alive at once
+    private static final int MIN_DISTANCE_FROM_PLAYER = 100; // Minimum spawn distance from player (reduced for easier spawning)
 
     private float spawnTimer = 0.0f;
     private List<Yapper> enemies = new ArrayList<>();
+    private List<Rectangle> spawnAreas = new ArrayList<>(); // YapperSpawn areas from map
     private Random random = new Random();
 
     private int worldWidth;
@@ -27,6 +32,29 @@ public class EnemySpawner {
     public EnemySpawner(float worldWidth, float worldHeight) {
         this.worldWidth = (int) worldWidth;
         this.worldHeight = (int) worldHeight;
+    }
+
+    public void loadSpawnAreasFromMap(MapObjects mapObjects) {
+        spawnAreas.clear();
+        System.out.println("Loading spawn areas from " + mapObjects.getCount() + " map objects...");
+        
+        for (MapObject mapObject : mapObjects) {
+            if (mapObject instanceof RectangleMapObject rectObject) {
+                String name = mapObject.getName();
+                System.out.println("Found map object: name='" + name + "', type=" + mapObject.getClass().getSimpleName());
+                
+                // Load objects that start with "YapperSpawn" (case-insensitive)
+                if (name != null && (name.startsWith("YapperSpawn") || name.startsWith("yapperspawn") || name.equalsIgnoreCase("YapperSpawn"))) {
+                    Rectangle rect = rectObject.getRectangle();
+                    spawnAreas.add(new Rectangle(rect.x, rect.y, rect.width, rect.height));
+                    System.out.println("✓ Loaded YapperSpawn area: " + name + " at (" + rect.x + ", " + rect.y + ") size " + rect.width + "x" + rect.height);
+                }
+            } else {
+                String name = mapObject.getName();
+                System.out.println("Skipped map object (not RectangleMapObject): name='" + name + "', type=" + mapObject.getClass().getSimpleName());
+            }
+        }
+        System.out.println("Total YapperSpawn areas loaded: " + spawnAreas.size());
     }
 
     //Updates the spawner logic, spawning enemies based on player's mental health
@@ -59,101 +87,67 @@ public class EnemySpawner {
         return MIN_SPAWN_INTERVAL + (invertedHealth * (MAX_SPAWN_INTERVAL - MIN_SPAWN_INTERVAL));
     }
 
-    // Spawns a new enemy within the viewport, respecting world boundaries
+    // Spawns a new enemy within YapperSpawn areas
 
     private void spawnEnemy(Player player, float vL, float vR, float vT, float vB) {
-        int spawnX, spawnY;
-        int attempts = 0;
-        int maxAttempts = 20;
-        int enemySize = 100; // Enemy width and height
-
-        // Clamp viewport boundaries to world boundaries
-        // This prevents spawning outside the world when player is near edges
-        float clampedVL = Math.max(vL, 0);
-        float clampedVR = Math.min(vR, worldWidth);
-        float clampedVT = Math.min(vT, worldHeight);
-        float clampedVB = Math.max(vB, 0);
-
-        // Adjust for enemy size to prevent spawning partially outside world
-        float spawnableWidth = clampedVR - clampedVL - enemySize;
-        float spawnableHeight = clampedVT - clampedVB - enemySize;
-
-        if (spawnableWidth <= 0 || spawnableHeight <= 0) {
-            spawnEnemyInWorld(player);
+        // If no spawn areas defined, don't spawn
+        if (spawnAreas.isEmpty()) {
+            System.out.println("No YapperSpawn areas found - cannot spawn enemies");
             return;
         }
 
-        // Try to find a valid spawn position within viewport
-        do {
-            spawnX = (int) (clampedVL + random.nextFloat() * spawnableWidth);
-            spawnY = (int) (clampedVB + random.nextFloat() * spawnableHeight);
-            attempts++;
-        } while (isTooCloseToPlayer(spawnX, spawnY, player) && attempts < maxAttempts);
-
-        // If failed to find a good position in viewport, spawn just outside it
-        if (attempts >= maxAttempts) {
-            spawnEnemyOffscreen(player, clampedVL, clampedVR, clampedVT, clampedVB);
-            return;
-        }
-
-        createEnemy(spawnX, spawnY);
-    }
-
-    //Spawns enemy anywhere in the world, away from player
-
-    private void spawnEnemyInWorld(Player player) {
-        int spawnX, spawnY;
+        int spawnX = 0;
+        int spawnY = 0;
         int attempts = 0;
-        int maxAttempts = 20;
-        int enemySize = 100;
+        int maxAttempts = 100; // Increased attempts
+        int enemyWidth = 24; // Same as player width
+        int enemyHeight = 32; // Same as player height
+        boolean foundPosition = false;
 
-        do {
-            spawnX = random.nextInt(worldWidth - enemySize);
-            spawnY = random.nextInt(worldHeight - enemySize);
+        // Try to find a valid spawn position within a YapperSpawn area
+        while (attempts < maxAttempts && !foundPosition) {
+            // Pick a random spawn area
+            Rectangle spawnArea = spawnAreas.get(random.nextInt(spawnAreas.size()));
+            
+            // Calculate spawnable area within the spawn zone (accounting for enemy size)
+            float spawnableWidth = Math.max(0, spawnArea.width - enemyWidth);
+            float spawnableHeight = Math.max(0, spawnArea.height - enemyHeight);
+            
+            // If area is too small (less than enemy size), skip it
+            if (spawnArea.width < enemyWidth || spawnArea.height < enemyHeight) {
+                attempts++;
+                continue;
+            }
+            
+            // Random position within the spawn area (clamp to ensure enemy fits)
+            if (spawnableWidth > 0) {
+                spawnX = (int) (spawnArea.x + random.nextFloat() * spawnableWidth);
+            } else {
+                spawnX = (int) spawnArea.x; // Center if area is exactly enemy size
+            }
+            
+            if (spawnableHeight > 0) {
+                spawnY = (int) (spawnArea.y + random.nextFloat() * spawnableHeight);
+            } else {
+                spawnY = (int) spawnArea.y; // Center if area is exactly enemy size
+            }
+            
+            // Check if position is valid (not too close to player)
+            if (!isTooCloseToPlayer(spawnX, spawnY, player)) {
+                foundPosition = true;
+            }
             attempts++;
-        } while (isTooCloseToPlayer(spawnX, spawnY, player) && attempts < maxAttempts);
-
-        createEnemy(spawnX, spawnY);
-    }
-
-    //Spawns enemy just outside the visible viewport
-
-    private void spawnEnemyOffscreen(Player player, float vL, float vR, float vT, float vB) {
-        int spawnX, spawnY;
-        int margin = 150; // Distance outside viewport
-        int enemySize = 100;
-
-        // Choose random side (0=left, 1=right, 2=top, 3=bottom)
-        int side = random.nextInt(4);
-
-        switch (side) {
-            case 0: // Left side
-                spawnX = Math.max(0, (int) (vL - margin));
-                spawnY = (int) (vB + random.nextFloat() * (vT - vB - enemySize));
-                break;
-            case 1: // Right side
-                spawnX = Math.min(worldWidth - enemySize, (int) (vR + margin));
-                spawnY = (int) (vB + random.nextFloat() * (vT - vB - enemySize));
-                break;
-            case 2: // Top side
-                spawnX = (int) (vL + random.nextFloat() * (vR - vL - enemySize));
-                spawnY = Math.min(worldHeight - enemySize, (int) (vT + margin));
-                break;
-            case 3: // Bottom side
-                spawnX = (int) (vL + random.nextFloat() * (vR - vL - enemySize));
-                spawnY = Math.max(0, (int) (vB - margin));
-                break;
-            default:
-                spawnX = (int) vL;
-                spawnY = (int) vB;
         }
 
-        // Ensure spawn position is within world boundaries
-        spawnX = Math.max(0, Math.min(worldWidth - enemySize, spawnX));
-        spawnY = Math.max(0, Math.min(worldHeight - enemySize, spawnY));
-
-        createEnemy(spawnX, spawnY);
+        // If found a valid position, spawn the enemy
+        if (foundPosition) {
+            System.out.println("Spawning Yapper at (" + spawnX + ", " + spawnY + ")");
+            createEnemy(spawnX, spawnY);
+        } else {
+            System.out.println("Failed to find valid spawn position after " + maxAttempts + " attempts");
+        }
     }
+
 
     //Creates a new enemy at the specified position
 

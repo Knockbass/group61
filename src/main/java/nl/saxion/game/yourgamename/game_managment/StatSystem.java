@@ -27,6 +27,13 @@ public class StatSystem {
         energy.applyMaxValueBound();
     }
 
+    //study at university - gives knowledge and decreases energy
+    public void studyAtUniversity(){
+        this.knowledge.setCurrentValue(new StatModifier(StatModifier.Type.ADDING, +15).getModifiedValue(knowledge));
+        this.energy.setCurrentValue(new StatModifier(StatModifier.Type.ADDING, -10).getModifiedValue(energy));
+        energy.applyMaxValueBound();
+    }
+
     //increase mentalHealth, Health, and energy, decrease knowledge
     public void dringBeer(){
         if (this.beerCount.get() > 0){
@@ -85,5 +92,34 @@ public class StatSystem {
 
     public int getMaxKnowledge(){
         return this.knowledge.getBaseValue();
+    }
+
+    // Getters for Stat objects (used by NPCSystem for rewards)
+    public Stat getKnowledgeStat() {
+        return knowledge;
+    }
+
+    public Stat getMentalHealthStat() {
+        return mentalHealth;
+    }
+
+    public Stat getEnergyStat() {
+        return energy;
+    }
+
+    public Stat getMoneyStat() {
+        return money;
+    }
+
+    public Stat getHPStat() {
+        return hp;
+    }
+
+    public Stat getBeerCountStat() {
+        return beerCount;
+    }
+
+    public int getBeerCount() {
+        return beerCount.get();
     }
 }
