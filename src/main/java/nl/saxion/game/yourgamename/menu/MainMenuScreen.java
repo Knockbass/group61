@@ -8,7 +8,6 @@ public class MainMenuScreen extends ScalableGameScreen {
     public MainMenuScreen() {
         super(1920, 1080);
     }
-
     boolean fadingIn = true;
     boolean fadingOut = true;
 

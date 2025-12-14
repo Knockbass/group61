@@ -1,6 +1,11 @@
 package nl.saxion.game.yourgamename.collision;
 
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import nl.saxion.game.yourgamename.entities.Box;
 import nl.saxion.game.yourgamename.entities.CombatEntity;
 import nl.saxion.game.yourgamename.entities.Player;
 import nl.saxion.game.yourgamename.game_managment.YourGameScreen;
@@ -18,6 +23,17 @@ public class CollisionManager {
             dynamic.add(entity);
         }
         collidableEntities.add(entity);
+    }
+
+    public static void addMapObjects(MapObjects objects){
+        for (MapObject object: objects){
+
+            if (object instanceof RectangleMapObject rectObject){
+                Rectangle rectangle = rectObject.getRectangle();    //Rectanlge is libDGX class
+                Box rect = new Box(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+                CollisionManager.addEntity(rect);
+            }
+        }
     }
 
     public static void checkCollision(float vL, float vR, float vT, float vB) {//left,right,top,bottom coordinates of viewport
@@ -42,8 +58,7 @@ public class CollisionManager {
 
     public static boolean isCollidingWithPlayer(Collidable a) {
         Player player = YourGameScreen.player;
-
-        return GameApp.rectOverlap(player.getX(), player.getY(), player.getWidth(), player.getHeight(),
+        return GameApp.rectOverlap(player.collisionBox.x, player.collisionBox.y, player.collisionBox.width, player.collisionBox.height,
                 a.getX(), a.getY(), a.getWidth(), a.getHeight());
     }
 

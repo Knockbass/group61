@@ -15,25 +15,28 @@ public class Collision {
         boolean bIsPlayer = b instanceof Player;
 
         //pushable && unpushable vs player
-        if (aIsPlayer) {
+        if (aIsPlayer && CollisionManager.isCollidingWithPlayer(b)) {
             if (b.isPushable()) {
-                resolveObjectOverlap(b, a);
+                resolvePlayerOverlap((Player) a, b);
                 return;
             } else {
                 b.setPushable(true);
-                resolveObjectOverlap(a, b);
+                resolvePlayerOverlap((Player) a, b);
                 return;
             }
         }
-        if (bIsPlayer) {
+        if (bIsPlayer && CollisionManager.isCollidingWithPlayer(a)) {
             if (a.isPushable()) {
-                resolveObjectOverlap(a, b);
+                resolvePlayerOverlap((Player) b, a);
                 return;
             } else {
                 a.setPushable(true);
-                resolveObjectOverlap(b, a);
+                resolvePlayerOverlap((Player) b, a);
                 return;
             }
+        }
+        if (aIsPlayer || bIsPlayer) {
+            return;
         }
 
         //pushable vs pushable
@@ -49,7 +52,7 @@ public class Collision {
         //unpushable vs unpushable
         if (!a.isPushable() && !b.isPushable() && CollisionManager.dynamic.contains(a)) {
             resolveObjectOverlap(a, b);
-        } else{
+        } else {
             resolveObjectOverlap(b, a);
         }
 
@@ -91,6 +94,59 @@ public class Collision {
                 a.setY(a.getY() + overlapY);
             }
         }
+    }
+
+    public static void resolvePlayerOverlap(Player player, Collidable object) {
+        // Find centers of player's collision box and object
+        int playerCenterX = player.collisionBox.x + player.collisionBox.width / 2;
+        int playerCenterY = player.collisionBox.y + player.collisionBox.height / 2;
+        int objectCenterX = object.getX() + object.getWidth() / 2;
+        int objectCenterY = object.getY() + object.getHeight() / 2;
+
+        // Calculate overlap
+        int overlapX = (player.collisionBox.width / 2 + object.getWidth() / 2) - Math.abs(playerCenterX - objectCenterX);
+        int overlapY = (player.collisionBox.height / 2 + object.getHeight() / 2) - Math.abs(playerCenterY - objectCenterY);
+
+        // If object is NOT pushable - move the player
+        if (!object.isPushable()) {
+            if (overlapX < overlapY) {
+                // Horizontal resolution
+                if (playerCenterX < objectCenterX) {
+                    player.collisionBox.x -= overlapX;  // Player on left - push left
+                } else {
+                    player.collisionBox.x += overlapX;  // Player on right - push right
+                }
+            } else {
+                // Vertical resolution
+                if (playerCenterY < objectCenterY) {
+                    player.collisionBox.y -= overlapY;  // Player below - push down
+                } else {
+                    player.collisionBox.y += overlapY;  // Player above - push up
+                }
+            }
+        }
+        // If object IS pushable - move the object
+        else {
+            if (overlapX < overlapY) {
+                // Horizontal resolution
+                if (playerCenterX < objectCenterX) {
+                    object.setX(object.getX() + overlapX);  // Push object right
+                } else {
+                    object.setX(object.getX() - overlapX);  // Push object left
+                }
+            } else {
+                // Vertical resolution
+                if (playerCenterY < objectCenterY) {
+                    object.setY(object.getY() + overlapY);  // Push object up
+                } else {
+                    object.setY(object.getY() - overlapY);  // Push object down
+                }
+            }
+        }
+
+        // Update player position from collision box
+        player.setX(player.collisionBox.x);
+        player.setY(player.collisionBox.y);
     }
 }
 

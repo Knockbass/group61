@@ -9,8 +9,7 @@ public class Main {
         // Add screens
         GameApp.addScreen("MainMenuScreen", new MainMenuScreen());
         GameApp.addScreen("YourGameScreen", new YourGameScreen());
-
         // Start game loop and show main menu screen
-        GameApp.start("Survive the Semester", 1920, 1080, 60, false, "MainMenuScreen");
+        GameApp.start("Survive the Semester", 1920, 1080, 60, false, "YourGameScreen");
     }
 }

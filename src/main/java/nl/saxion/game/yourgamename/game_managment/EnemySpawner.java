@@ -13,7 +13,7 @@ public class EnemySpawner {
     private static final float MIN_SPAWN_INTERVAL = 0.5f; // Fastest spawn rate (low mental health)
     private static final float MAX_SPAWN_INTERVAL = 8.0f; // Slowest spawn rate (high mental health)
 
-    private static final int MAX_ENEMIES = 3; // Maximum number of enemies alive at once
+    private static final int MAX_ENEMIES = 0; // Maximum number of enemies alive at once
     private static final int MIN_DISTANCE_FROM_PLAYER = 200; // Minimum spawn distance from player
 
     private float spawnTimer = 0.0f;

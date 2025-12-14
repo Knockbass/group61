@@ -1,6 +1,6 @@
 package nl.saxion.game.yourgamename.entities;
 
-public class Rectangle {
+public class Rectangle{
     public int x, y, width, height;
 
     public Rectangle() {

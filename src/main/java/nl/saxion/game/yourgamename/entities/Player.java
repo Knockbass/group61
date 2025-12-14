@@ -2,6 +2,7 @@ package nl.saxion.game.yourgamename.entities;
 
 import nl.saxion.game.yourgamename.collision.Collidable;
 import nl.saxion.game.yourgamename.game_managment.StatSystem;
+import nl.saxion.game.yourgamename.game_managment.YourGameScreen;
 import nl.saxion.game.yourgamename.movement.Vector2;
 
 public class Player extends CombatEntity implements Collidable {
@@ -9,16 +10,18 @@ public class Player extends CombatEntity implements Collidable {
     public boolean attacking;
     public float attackTimer, attackDuration;
     public Direction facing;
+    public Rectangle collisionBox;
     private boolean isPushable = true;
     public boolean hasHitEnemy;
     private StatSystem statSystem = new StatSystem();
 
     public Player(String name, int movementSpeed) {
         super.name = name;
-        super.entityWidth = 100;
-        super.entityHeight = 100;
-        super.position = new Vector2();
+        super.entityWidth = 24;
+        super.entityHeight = 32;
+        super.position = new Vector2(200, YourGameScreen.worldHeight - entityHeight - 281);
         super.hitbox = new Rectangle();
+        this.collisionBox = new Rectangle(getX() + 4,getY(),16,16);
         this.facing = Direction.RIGHT;
         this.attackTimer = 0f;          //can be used as duration of the animation of attack
         this.movementSpeed = movementSpeed;

@@ -6,18 +6,21 @@ import nl.saxion.game.yourgamename.movement.Vector2;
 import java.util.ArrayList;
 
 public class Box extends Entity implements Collidable {
-    private final int WIDTH = 100;
-    private final int HEIGHT = 100;
+    private final float WIDTH;
+    private final float HEIGHT;
     Vector2 position = new Vector2();
     private final boolean isPushable = false;
 
-    public Box(){
-        super("Nameless");
+    public Box(float width, float height){
+        WIDTH = width;
+        HEIGHT = height;
     }
 
-    public Box(int x, int y){
-        setX(x);
-        setY(y);
+    public Box(float x, float y, float width, float height){
+        setX((int) x);
+        setY((int) y);
+        this.HEIGHT = height;
+        this.WIDTH = width;
     }
 
     @Override
@@ -42,12 +45,12 @@ public class Box extends Entity implements Collidable {
 
     @Override
     public int getWidth() {
-        return WIDTH;
+        return (int) WIDTH;
     }
 
     @Override
     public int getHeight() {
-        return HEIGHT;
+        return (int) HEIGHT;
     }
 
     @Override
