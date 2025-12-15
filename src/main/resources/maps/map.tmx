@@ -1361,7 +1361,7 @@
   <object id="91" x="1648.5" y="386" width="110.75" height="13.5"/>
   <object id="92" x="1503" y="386" width="96.25" height="12.5"/>
   <object id="93" x="1503.5" y="320.25" width="17" height="51.5"/>
-  <object id="94" x="1521.25" y="348.5" width="17.75" height="23.5"/>
+  <object id="94" x="1521.25" y="348.5" width="17.75" height="45.6201"/>
   <object id="95" x="1504" y="287.75" width="61.25" height="32"/>
   <object id="96" x="1551.5" y="319.5" width="9.75" height="4.5"/>
   <object id="97" x="1565.5" y="296.75" width="9.25" height="14"/>
@@ -1378,7 +1378,7 @@
   <object id="109" x="1575.5" y="301.75" width="3.75" height="2.5"/>
   <object id="110" x="1552.75" y="324" width="4" height="3.5"/>
   <object id="112" x="1692.75" y="237.5" width="54" height="20.5"/>
-  <object id="113" x="1504.25" y="237.75" width="51.25" height="20.25"/>
+  <object id="113" x="1504.25" y="161.18" width="252.883" height="123.194"/>
   <object id="114" x="1600.25" y="336.125" width="47.625" height="19.75"/>
   <object id="117" x="1613.67" y="301.333" width="21" height="21.6667"/>
   <object id="123" x="128" y="172" width="128" height="68"/>
@@ -1390,7 +1390,7 @@
   <object id="131" name="YapperSpawn2" x="1031.43" y="487.501" width="465.039" height="97.1878"/>
  </objectgroup>
  <objectgroup id="26" name="Events">
-  <object id="36" name="UniEntrance" x="1564" y="236" width="130.097" height="32"/>
+  <object id="36" name="UniEntrance" x="1583.57" y="288.748" width="80.7521" height="32"/>
   <object id="38" name="Sleep" x="205" y="225" width="36" height="36"/>
   <object id="126" name="NPC1" x="297.745" y="414.398" width="38.8846" height="23.3307"/>
  </objectgroup>
