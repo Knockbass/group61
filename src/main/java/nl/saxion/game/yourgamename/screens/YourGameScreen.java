@@ -1,14 +1,15 @@
-package nl.saxion.game.yourgamename.game_managment;
+package nl.saxion.game.yourgamename.screens;
 
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
 import nl.saxion.game.yourgamename.collision.*;
+import nl.saxion.game.yourgamename.game_managment.*;
 import nl.saxion.game.yourgamename.movement.*;
+import nl.saxion.game.yourgamename.systems.CombatSystem;
+import nl.saxion.game.yourgamename.systems.EventInteractionSystem;
+import nl.saxion.game.yourgamename.systems.NPCSystem;
 import nl.saxion.gameapp.GameApp;
-import nl.saxion.gameapp.screens.CameraControlledGameScreen;
 import nl.saxion.game.yourgamename.entities.*;
-import nl.saxion.gameapp.screens.GameScreen;
 
 public class YourGameScreen extends BaseGameScreen {
     public static int worldWidth = 1920;        //world size

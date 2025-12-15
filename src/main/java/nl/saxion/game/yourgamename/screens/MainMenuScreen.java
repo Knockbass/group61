@@ -1,4 +1,4 @@
-package nl.saxion.game.yourgamename.menu;
+package nl.saxion.game.yourgamename.screens;
 
 import com.badlogic.gdx.Input;
 import nl.saxion.gameapp.GameApp;

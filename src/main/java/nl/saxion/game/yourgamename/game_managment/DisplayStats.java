@@ -2,6 +2,7 @@ package nl.saxion.game.yourgamename.game_managment;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import nl.saxion.game.yourgamename.systems.StatSystem;
 import nl.saxion.gameapp.GameApp;
 import nl.saxion.game.yourgamename.entities.Player;
 

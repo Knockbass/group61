@@ -1,8 +1,8 @@
 package nl.saxion.game.yourgamename.entities;
 
 import nl.saxion.game.yourgamename.collision.Collidable;
-import nl.saxion.game.yourgamename.game_managment.StatSystem;
-import nl.saxion.game.yourgamename.game_managment.YourGameScreen;
+import nl.saxion.game.yourgamename.systems.StatSystem;
+import nl.saxion.game.yourgamename.screens.YourGameScreen;
 import nl.saxion.game.yourgamename.movement.Vector2;
 
 public class Player extends CombatEntity implements Collidable {

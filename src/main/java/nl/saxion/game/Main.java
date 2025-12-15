@@ -1,7 +1,7 @@
 package nl.saxion.game;
 
-import nl.saxion.game.yourgamename.game_managment.YourGameScreen;
-import nl.saxion.game.yourgamename.menu.MainMenuScreen;
+import nl.saxion.game.yourgamename.screens.YourGameScreen;
+import nl.saxion.game.yourgamename.screens.MainMenuScreen;
 import nl.saxion.gameapp.GameApp;
 
 public class Main {

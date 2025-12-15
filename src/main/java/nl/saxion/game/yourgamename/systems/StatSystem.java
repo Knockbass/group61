@@ -1,4 +1,7 @@
-package nl.saxion.game.yourgamename.game_managment;
+package nl.saxion.game.yourgamename.systems;
+
+import nl.saxion.game.yourgamename.game_managment.Stat;
+import nl.saxion.game.yourgamename.game_managment.StatModifier;
 
 public class StatSystem {
 

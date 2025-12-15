@@ -1,6 +1,7 @@
 package nl.saxion.game.yourgamename.game_managment;
 
 import nl.saxion.game.yourgamename.entities.Player;
+import nl.saxion.game.yourgamename.systems.StatSystem;
 
 public class Quest {
     public enum QuestState {

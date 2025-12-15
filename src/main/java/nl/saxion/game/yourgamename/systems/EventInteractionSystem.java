@@ -1,4 +1,4 @@
-package nl.saxion.game.yourgamename.game_managment;
+package nl.saxion.game.yourgamename.systems;
 
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
