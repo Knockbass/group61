@@ -34,9 +34,10 @@ public class YourGameScreen extends BaseGameScreen {
         MapObjects collisionObjects = world.getObjectLayer("Collisions").getObjects();
         CollisionManager.addMapObjects(collisionObjects);
 
-        GameApp.addTexture("player", "textures/player.png");
         // Add enemy texture (using bear as placeholder - replace with enemy.png when available)
         GameApp.addTexture("enemy", "textures/bear.png");
+        GameApp.addSpriteSheet("idle", "textures/idleanimation3.png", 128, 256);
+        GameApp.addAnimationFromSpritesheet("idleAnim", "idle", 0.15f, true);
         GameApp.addFont("hud", "fonts/basic.ttf", 20, true);
         GameApp.addFont("default", "fonts/basic.ttf", 18);
 
@@ -105,12 +106,7 @@ public class YourGameScreen extends BaseGameScreen {
             // Check for NPC interaction first (within 50 pixel range)
             if (!npcSystem.interactWithNearbyNPC(50f)) {
                 // Check for event interaction (like UniEntrance)
-                if (!eventSystem.interactWithNearbyEvent(50f)) {
-                    // If no NPC or event nearby, use default E key actions
-                    player.accessStatSystem().sleep();
-                    player.accessStatSystem().study();
-                    player.accessStatSystem().dringBeer();
-                }
+                eventSystem.interactWithNearbyEvent(50f);
             }
         }
 
@@ -134,9 +130,9 @@ public class YourGameScreen extends BaseGameScreen {
 
     private void renderEntities() {
         GameApp.startSpriteRendering();
-        GameApp.drawTexture("player",player.getX(), player.getY(), player.getWidth(), player.getHeight());
-
-        GameApp.drawTexture("player", player.position.getX(), player.position.getY(), player.getWidth(), player.getHeight());
+        GameApp.updateAnimation("idleAnim");
+        // Scale animation to match player size (16x24) - original spritesheet frames are 128x256
+        GameApp.drawAnimation("idleAnim", player.position.getX(), player.position.getY(), player.getWidth(), player.getHeight());
 
         for (Yapper enemy : enemySpawner.getEnemies()) {
            GameApp.drawTexture("enemy", enemy.position.getX(), enemy.position.getY(), enemy.getWidth(), enemy.getHeight());
@@ -158,7 +154,8 @@ public class YourGameScreen extends BaseGameScreen {
     @Override
     public void hide() {
         world.dispose();
-        GameApp.disposeTexture("player");
+        GameApp.disposeSpritesheet("idle");
+        GameApp.disposeAnimation("idleAnim");
         //GameApp.disposeTexture("enemy");
     }
 }
