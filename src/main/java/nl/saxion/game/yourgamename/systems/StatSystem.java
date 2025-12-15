@@ -12,6 +12,7 @@ public class StatSystem {
     private Stat energy = new Stat(100);        //idk
     private Stat hp = new Stat(100);            //player's hp
     private Stat beerCount = new Stat(1);
+    private int currentDay = 1;                 // Track current day (increments when sleeping)
 
     //increase mental health and energy
     public void sleep(){
@@ -19,6 +20,12 @@ public class StatSystem {
         this.energy.setCurrentValue(new StatModifier(StatModifier.Type.ADDING, +25).getModifiedValue(energy));
         mentalHealth.applyMaxValueBound();
         energy.applyMaxValueBound();
+        // Increment day when sleeping
+        currentDay++;
+    }
+    
+    public int getCurrentDay() {
+        return currentDay;
     }
 
     //increase knowledge, decrease mental health and energy

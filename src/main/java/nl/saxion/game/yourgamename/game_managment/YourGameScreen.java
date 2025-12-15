@@ -1,16 +1,16 @@
-package nl.saxion.game.yourgamename.screens;
+package nl.saxion.game.yourgamename.game_managment;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
 import nl.saxion.game.yourgamename.collision.*;
-import nl.saxion.game.yourgamename.game_managment.*;
 import nl.saxion.game.yourgamename.movement.*;
-import nl.saxion.game.yourgamename.systems.CombatSystem;
-import nl.saxion.game.yourgamename.systems.EventInteractionSystem;
-import nl.saxion.game.yourgamename.systems.NPCSystem;
-import nl.saxion.game.yourgamename.systems.StudyQuizSystem;
+import nl.saxion.game.yourgamename.screens.BaseGameScreen;
+import nl.saxion.game.yourgamename.systems.*;
 import nl.saxion.gameapp.GameApp;
+import nl.saxion.gameapp.screens.CameraControlledGameScreen;
 import nl.saxion.game.yourgamename.entities.*;
+import nl.saxion.gameapp.screens.GameScreen;
 
 public class YourGameScreen extends BaseGameScreen {
     public static int worldWidth = 1920;        //world size
@@ -40,7 +40,6 @@ public class YourGameScreen extends BaseGameScreen {
         GameApp.addTexture("enemy", "textures/bear.png");
         GameApp.addSpriteSheet("idle", "textures/idleanimation3.png", 128, 256);
         GameApp.addAnimationFromSpritesheet("idleAnim", "idle", 0.15f, true);
-        GameApp.addTexture("quizBackground", "textures/quiz.png");
         GameApp.addFont("hud", "fonts/basic.ttf", 20, true);
         GameApp.addFont("default", "fonts/basic.ttf", 18);
 
@@ -67,6 +66,9 @@ public class YourGameScreen extends BaseGameScreen {
     public void render(float delta) {
         // Update quiz system
         StudyQuizSystem quizSystem = eventSystem.getQuizSystem();
+        if (quizSystem.isActive()) {
+            System.out.println("Updating quiz - Phase: " + quizSystem.getCurrentPhase() + ", Delta: " + delta);
+        }
         quizSystem.update(delta);
         
         // Only allow player movement if quiz is not active
@@ -77,7 +79,8 @@ public class YourGameScreen extends BaseGameScreen {
         }
 
         // Check if quiz is active - if so, skip normal game rendering
-        if (!quizSystem.isActive()) {
+        StudyQuizSystem quizSystemCheck = eventSystem.getQuizSystem();
+        if (!quizSystemCheck.isActive()) {
             //update screen
             setCameraTarget(player.getX(), player.getY());
 
@@ -94,6 +97,7 @@ public class YourGameScreen extends BaseGameScreen {
             //render interaction prompts on top of everything (trees, blocks, etc.)
             renderInteractionPrompts();
         }
+
 
         // Update NPC system (for clearing completed quest display)
         npcSystem.update(delta);
@@ -116,10 +120,17 @@ public class YourGameScreen extends BaseGameScreen {
 
         // Only allow E key interaction if quiz is not active
         if (!quizSystem.isActive() && GameApp.isKeyJustPressed(Input.Keys.E)) {
+            System.out.println("E key pressed!");
             // Check for NPC interaction first (within 50 pixel range)
             if (!npcSystem.interactWithNearbyNPC(50f)) {
+                System.out.println("No NPC nearby, checking for events...");
                 // Check for event interaction (like UniEntrance) - increased range to 100
-                eventSystem.interactWithNearbyEvent(100f);
+                boolean eventFound = eventSystem.interactWithNearbyEvent(100f);
+                if (!eventFound) {
+                    System.out.println("No event found nearby");
+                }
+            } else {
+                System.out.println("NPC interaction handled");
             }
         }
 
@@ -130,18 +141,22 @@ public class YourGameScreen extends BaseGameScreen {
         CollisionManager.checkCollision(getViewportLeft(),getViewportRight(),getViewportTop(),getViewportBottom());
 
         // Render quiz overlay if active (on top of everything)
-        if (quizSystem.isActive()) {
-            // Clear screen and draw quiz background
+        // Get fresh reference to quiz system
+        StudyQuizSystem quizSystemForRender = eventSystem.getQuizSystem();
+        boolean quizActive = quizSystemForRender.isActive();
+        System.out.println("Checking quiz for render - isActive: " + quizActive + ", Phase: " + quizSystemForRender.getCurrentPhase());
+        
+        if (quizActive) {
+            System.out.println("Quiz is active! Phase: " + quizSystemForRender.getCurrentPhase() + ", Screen: " + getScreenWidth() + "x" + getScreenHeight());
+            // Clear screen to light beige/off-white for quiz (matching template)
+            // Try white if beige doesn't work
             GameApp.clearScreen("white");
-            // Draw quiz background image covering full screen
-            float screenWidth = getScreenWidth();
-            float screenHeight = getScreenHeight();
-            GameApp.startSpriteRendering();
-            GameApp.drawTexture("quizBackground", 0, 0, screenWidth, screenHeight);
-            GameApp.endSpriteRendering();
-            // Render quiz UI on top of background
-            quizSystem.render(screenWidth, screenHeight);
+            System.out.println("Screen cleared to white");
+            // Render quiz UI
+            quizSystemForRender.render(getScreenWidth(), getScreenHeight());
+            System.out.println("Quiz render completed");
         } else {
+            System.out.println("Quiz is NOT active, rendering normal HUD");
             // Render HUD (stats display) - render after everything else so it's on top
             // Use screen dimensions for pixel-perfect rendering
             DisplayStats.render(player, getScreenWidth(), getScreenHeight(), getCamera());
@@ -183,7 +198,6 @@ public class YourGameScreen extends BaseGameScreen {
         world.dispose();
         GameApp.disposeSpritesheet("idle");
         GameApp.disposeAnimation("idleAnim");
-        GameApp.disposeTexture("quizBackground");
         //GameApp.disposeTexture("enemy");
     }
 }

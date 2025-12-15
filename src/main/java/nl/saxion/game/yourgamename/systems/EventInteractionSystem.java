@@ -13,23 +13,28 @@ import java.util.List;
 public class EventInteractionSystem {
     private List<EventArea> eventAreas;
     private Player player;
+    private StudyQuizSystem quizSystem;
 
     public EventInteractionSystem(Player player) {
         this.eventAreas = new ArrayList<>();
         this.player = player;
+        this.quizSystem = new StudyQuizSystem(player);
     }
 
     public void loadEventsFromMap(MapObjects mapObjects) {
+        System.out.println("Loading events from map. Total objects: " + mapObjects.getCount());
         for (MapObject mapObject : mapObjects) {
             if (mapObject instanceof RectangleMapObject rectObject) {
                 String name = mapObject.getName();
-                if (name != null) {
+                if (name != null && !name.startsWith("NPC")) { // Skip NPCs, they're handled separately
                     Rectangle rect = rectObject.getRectangle();
                     EventArea event = new EventArea(name, rect.x, rect.y, rect.width, rect.height);
                     eventAreas.add(event);
+                    System.out.println("Loaded event: " + name + " at (" + rect.x + ", " + rect.y + ")");
                 }
             }
         }
+        System.out.println("Total events loaded: " + eventAreas.size());
     }
 
     public EventArea getNearbyEvent(float interactionRange) {
@@ -57,20 +62,62 @@ public class EventInteractionSystem {
     public boolean interactWithNearbyEvent(float interactionRange) {
         EventArea nearbyEvent = getNearbyEvent(interactionRange);
         if (nearbyEvent != null) {
+            System.out.println("Found nearby event: " + nearbyEvent.getName());
             handleEventInteraction(nearbyEvent);
             return true;
+        } else {
+            System.out.println("No nearby event found within range: " + interactionRange);
+            // Debug: print all events and distances
+            float playerCenterX = player.getX() + player.getWidth() / 2f;
+            float playerCenterY = player.getY() + player.getHeight() / 2f;
+            System.out.println("Player position: (" + playerCenterX + ", " + playerCenterY + ")");
+            System.out.println("Total events loaded: " + eventAreas.size());
+            for (EventArea event : eventAreas) {
+                Rectangle area = event.getArea();
+                float eventCenterX = area.x + area.width / 2f;
+                float eventCenterY = area.y + area.height / 2f;
+                float distance = (float) Math.sqrt(
+                    Math.pow(playerCenterX - eventCenterX, 2) + 
+                    Math.pow(playerCenterY - eventCenterY, 2)
+                );
+                System.out.println("Event '" + event.getName() + "' at (" + eventCenterX + ", " + eventCenterY + ") - Distance: " + distance);
+            }
         }
         return false;
     }
 
     private void handleEventInteraction(EventArea event) {
         String eventName = event.getName();
+        System.out.println("Event interaction triggered: " + eventName);
         
         if (eventName.equals("UniEntrance")) {
-            // Study at university - gives knowledge and decreases energy
-            player.accessStatSystem().studyAtUniversity();
-            System.out.println("Studied at University! Knowledge +15, Energy -10");
+            // Start quiz instead of direct study
+            if (!quizSystem.isActive()) {
+                System.out.println("Starting quiz...");
+                quizSystem.startQuiz();
+                if (quizSystem.isActive()) {
+                    System.out.println("Quiz started. Active: " + quizSystem.isActive());
+                } else {
+                    System.out.println("Quiz could not start - may have been completed today already");
+                }
+            } else {
+                System.out.println("Quiz already active, cannot start new one");
+            }
+        } else if (eventName.equals("Sleep")) {
+            // Sleep event - restore stats and advance to next day
+            StatSystem stats = player.accessStatSystem();
+            int currentDay = stats.getCurrentDay();
+            stats.sleep();
+            int newDay = stats.getCurrentDay();
+            System.out.println("Player slept! Day advanced from " + currentDay + " to " + newDay);
+            System.out.println("Mental Health and Energy restored!");
+        } else {
+            System.out.println("Event name '" + eventName + "' does not match known events");
         }
+    }
+    
+    public StudyQuizSystem getQuizSystem() {
+        return quizSystem;
     }
 
     public void renderInteractionPrompt(float interactionRange) {
@@ -82,8 +129,16 @@ public class EventInteractionSystem {
                 String descriptionText = "";
                 
                 if (eventName.equals("UniEntrance")) {
-                    promptText = "Press E to study at University";
-                    descriptionText = "Gain Knowledge, Lose Energy";
+                    if (quizSystem.canStartQuiz()) {
+                        promptText = "Press E to study at University";
+                        descriptionText = "Take Quiz (4 questions)";
+                    } else {
+                        promptText = "Press E to study at University";
+                        descriptionText = "Quiz already completed today";
+                    }
+                } else if (eventName.equals("Sleep")) {
+                    promptText = "Press E to Sleep";
+                    descriptionText = "Restore Energy & Mental Health (Next Day)";
                 }
                 
                 if (!promptText.isEmpty()) {
