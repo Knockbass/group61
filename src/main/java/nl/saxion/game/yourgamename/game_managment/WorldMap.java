@@ -19,20 +19,24 @@ public class WorldMap {
             0, // grass
             1, // water
             2, // island_ground
-            4, // walls
-            5, // road
-            6, // grass_decor
-            8, // floor
-            9,  // uni_borders
-            10,  // buildings
-            11 // decorations
+            3, // island_decoration
+            5, // walls
+            6, // road
+            7, // grass_decor
+            9, // floor
+            10,  // uni_borders
+            11,  // buildings
+            12, // decorations
+            13, // ships
+            14, // ships_flag
+            15 // market_area
     };
 
     private final int[] layersAbovePlayer = {
-            3,  // trees
-            7,  // trees_overlap
-            12, // roofs
-            13  // shadows
+            4,  // trees
+            8,  // trees_overlap
+            16, // roofs
+            17  // shadows
     };
 
     public void dispose() {
