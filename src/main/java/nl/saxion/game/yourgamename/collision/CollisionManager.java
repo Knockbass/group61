@@ -4,11 +4,10 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import nl.saxion.game.yourgamename.entities.Box;
 import nl.saxion.game.yourgamename.entities.CombatEntity;
 import nl.saxion.game.yourgamename.entities.Player;
-import nl.saxion.game.yourgamename.game_managment.YourGameScreen;
+import nl.saxion.game.yourgamename.screens.YourGameScreen;
 import nl.saxion.gameapp.GameApp;
 
 import java.util.ArrayList;

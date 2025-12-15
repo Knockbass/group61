@@ -2,7 +2,6 @@ package nl.saxion.game.yourgamename.collision;
 
 import nl.saxion.game.yourgamename.entities.Box;
 import nl.saxion.game.yourgamename.entities.Player;
-import nl.saxion.game.yourgamename.game_managment.YourGameScreen;
 import nl.saxion.gameapp.GameApp;
 
 public class Collision {

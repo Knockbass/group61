@@ -1,4 +1,4 @@
-package nl.saxion.game.yourgamename.game_managment;
+package nl.saxion.game.yourgamename.systems;
 
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
@@ -6,6 +6,7 @@ import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Rectangle;
 import nl.saxion.game.yourgamename.entities.NPC;
 import nl.saxion.game.yourgamename.entities.Player;
+import nl.saxion.game.yourgamename.game_managment.Quest;
 import nl.saxion.gameapp.GameApp;
 
 import java.util.ArrayList;
