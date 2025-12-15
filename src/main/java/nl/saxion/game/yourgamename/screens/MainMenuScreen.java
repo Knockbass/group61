@@ -8,8 +8,6 @@ public class MainMenuScreen extends ScalableGameScreen {
     public MainMenuScreen() {
         super(1920, 1080);
     }
-    boolean fadingIn = true;
-    boolean fadingOut = true;
 
     boolean inputLocked = false;
 
@@ -36,12 +34,12 @@ public class MainMenuScreen extends ScalableGameScreen {
     final float textPos3 = height / 2 - 100;
     final float textPos4 = height / 2 - 300;
 
-    float limitButtonStartX1 = width / 2 + 75;
-    float limitButtonStartX2 = width / 2 + 735;
+    float limitButtonStartX1 = width / 2 + 175;
+    float limitButtonStartX2 = width / 2 + 825;
     float limitButtonStartY1 = height / 2 - 140;
-    float limitButtonStartY2 = height / 2 - 70;
-    float limitButtonSleepX1 = width / 2 + 120;
-    float limitButtonSleepX2 = width / 2 + 690;
+    float limitButtonStartY2 = height / 2 - 72;
+    float limitButtonSleepX1 = width / 2 + 215;
+    float limitButtonSleepX2 = width / 2 + 780;
     float limitButtonSleepY1 = height / 2 - 340;
     float limitButtonSleepY2 = height / 2 - 270;
 
@@ -69,6 +67,7 @@ public class MainMenuScreen extends ScalableGameScreen {
         GameApp.addInterpolator("arrow", width + animStart2, width - animArrow, 1f, "fade");
         GameApp.addSpriteSheet("sleepingCharacter", "textures/testanim.png", 1317, 816);
         GameApp.addAnimationFromSpritesheet("sleepingAnim", "sleepingCharacter", 0.7f, true);
+        GameApp.setCustomCursor("textures/cursor (1).png", 23, 17);
     }
 
     @Override
@@ -131,8 +130,10 @@ public class MainMenuScreen extends ScalableGameScreen {
                 }
             }
             if (whichChoice == 2) {
+                GameApp.startSpriteRendering();
                 GameApp.updateAnimation("sleepingAnim");
                 GameApp.drawAnimation("sleepingAnim", 0, +110, 900, 500);
+                GameApp.endSpriteRendering();
                 if (GameApp.isInterpolatorFinished("fadeOut4")) {
                     GameApp.quit();
                 }

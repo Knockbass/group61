@@ -42,6 +42,7 @@ public class YourGameScreen extends BaseGameScreen {
         GameApp.addAnimationFromSpritesheet("idleAnim", "idle", 0.15f, true);
         GameApp.addFont("hud", "fonts/basic.ttf", 20, true);
         GameApp.addFont("default", "fonts/basic.ttf", 18);
+        GameApp.addFont("pixel2", "fonts/Jersey10-Regular.ttf", 100);
 
         player = new Player("player", 125);
         enemySpawner = new EnemySpawner(worldWidth, worldHeight);
@@ -60,6 +61,7 @@ public class YourGameScreen extends BaseGameScreen {
 
         CollisionManager.addEntity(player);
         setCameraTargetInstantly(player.getX(), player.getY());
+        GameApp.setCustomCursor("textures/cursor (1).png", 23, 17);
     }
 
     @Override
