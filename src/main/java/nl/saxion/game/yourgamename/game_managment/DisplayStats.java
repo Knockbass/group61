@@ -47,6 +47,10 @@ public class DisplayStats {    //this class is used to display the stats of the 
         // Display all stats with better formatting
         float y = startY;
         
+        // Day (at the top)
+        GameApp.drawText("hud", "Day: " + stats.getCurrentDay(), startX, y, "purple-500");
+        y -= lineHeight;
+        
         // HP (Health Points)
         GameApp.drawText("hud", "HP: " + stats.getHP() + "/" + stats.getMaxHP(), startX, y, "red-500");
         y -= lineHeight;
