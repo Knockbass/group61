@@ -39,8 +39,16 @@ public class YourGameScreen extends BaseGameScreen {
         // Add enemy texture (using bear as placeholder - replace with enemy.png when available)
         GameApp.addTexture("enemy", "textures/bear.png");
         GameApp.addSpriteSheet("idle", "textures/idleanimation3.png", 128, 256);
+        GameApp.addSpriteSheet("walkingRight", "textures/walkinganimright.png", 128, 256);
+        GameApp.addSpriteSheet("walkingLeft", "textures/walkinganimleft.png", 128, 256);
+        GameApp.addSpriteSheet("walkingUp", "textures/walkinganimup.png", 128, 256);
+        GameApp.addSpriteSheet("walkingDown", "textures/walkinganimdown.png", 128, 256);
         GameApp.addAnimationFromSpritesheet("idleAnim", "idle", 0.15f, true);
-        GameApp.addTexture("quizBackground", "textures/quiz.png");
+        GameApp.addAnimationFromSpritesheet("walkingAnimDown", "walkingDown", 0.25f, true);
+        GameApp.addAnimationFromSpritesheet("walkingAnimUp", "walkingUp", 0.15f, true);
+        GameApp.addAnimationFromSpritesheet("walkingAnimRight", "walkingRight", 0.15f, true);
+        GameApp.addAnimationFromSpritesheet("walkingAnimLeft", "walkingLeft", 0.15f, true);
+        GameApp.addTexture("quizBackground", "textures/quizbg.png");
         GameApp.addFont("hud", "fonts/basic.ttf", 20, true);
         GameApp.addFont("default", "fonts/basic.ttf", 18);
 
@@ -137,7 +145,7 @@ public class YourGameScreen extends BaseGameScreen {
             float screenWidth = getScreenWidth();
             float screenHeight = getScreenHeight();
             GameApp.startSpriteRendering();
-            GameApp.drawTexture("quizBackground", 0, 0, screenWidth, screenHeight);
+            GameApp.drawTexture("quizBackground", player.position.getX() - viewportWidth/2, player.position.getY() - viewportHeight/2, viewportWidth, viewportHeight);
             GameApp.endSpriteRendering();
             // Render quiz UI on top of background
             quizSystem.render(screenWidth, screenHeight);
@@ -157,10 +165,27 @@ public class YourGameScreen extends BaseGameScreen {
 
     private void renderEntities() {
         GameApp.startSpriteRendering();
-        GameApp.updateAnimation("idleAnim");
-        // Scale animation to match player size (16x24) - original spritesheet frames are 128x256
-        GameApp.drawAnimation("idleAnim", player.position.getX(), player.position.getY(), player.getWidth(), player.getHeight());
-
+        if (GameApp.isKeyPressed(Input.Keys.RIGHT) || GameApp.isKeyPressed(Input.Keys.D)) {
+            GameApp.updateAnimation("walkingAnimRight");
+            GameApp.drawAnimation("walkingAnimRight", player.position.getX(), player.position.getY(), player.getWidth(), player.getHeight());
+        } else if (GameApp.isKeyPressed(Input.Keys.UP) || GameApp.isKeyPressed(Input.Keys.W)) {
+            GameApp.updateAnimation("walkingAnimUp");
+            GameApp.drawAnimation("walkingAnimUp", player.position.getX(), player.position.getY(), player.getWidth(), player.getHeight());
+        } else if (GameApp.isKeyPressed(Input.Keys.LEFT) || GameApp.isKeyPressed(Input.Keys.A)) {
+            GameApp.updateAnimation("walkingAnimLeft");
+            GameApp.drawAnimation("walkingAnimLeft", player.position.getX(), player.position.getY(), player.getWidth(), player.getHeight());
+        } else if (GameApp.isKeyPressed(Input.Keys.DOWN) || GameApp.isKeyPressed(Input.Keys.S)) {
+            GameApp.updateAnimation("walkingAnimDown");
+            GameApp.drawAnimation("walkingAnimDown", player.position.getX(), player.position.getY(), player.getWidth(), player.getHeight());
+        } else {
+            GameApp.resetAnimation("walkingAnimRight");
+            GameApp.resetAnimation("walkingAnimLeft");
+            GameApp.resetAnimation("walkingAnimUp");
+            GameApp.resetAnimation("walkingAnimDown");
+            GameApp.updateAnimation("idleAnim");
+            // Scale animation to match player size (16x24) - original spritesheet frames are 128x256
+            GameApp.drawAnimation("idleAnim", player.position.getX(), player.position.getY(), player.getWidth(), player.getHeight());
+        }
         for (Yapper enemy : enemySpawner.getEnemies()) {
            GameApp.drawTexture("enemy", enemy.position.getX(), enemy.position.getY(), enemy.getWidth(), enemy.getHeight());
          }
@@ -182,6 +207,14 @@ public class YourGameScreen extends BaseGameScreen {
     public void hide() {
         world.dispose();
         GameApp.disposeSpritesheet("idle");
+        GameApp.disposeSpritesheet("walkingRight");
+        GameApp.disposeSpritesheet("walkingLeft");
+        GameApp.disposeSpritesheet("walkingUp");
+        GameApp.disposeSpritesheet("walkingDown");
+        GameApp.disposeAnimation("walkingAnimRight");
+        GameApp.disposeAnimation("walkingAnimLeft");
+        GameApp.disposeAnimation("walkingAnimUp");
+        GameApp.disposeAnimation("walkingAnimDown");
         GameApp.disposeAnimation("idleAnim");
         GameApp.disposeTexture("quizBackground");
         //GameApp.disposeTexture("enemy");
