@@ -512,5 +512,9 @@ public class StudyQuizSystem {
         correctAnswers = 0;
         quizQuestions.clear();
     }
+
+    public void setPlayer(Player player){
+        this.player = player;
+    }
 }
 

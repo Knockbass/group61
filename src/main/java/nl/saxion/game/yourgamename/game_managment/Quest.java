@@ -17,6 +17,8 @@ public class Quest {
     private int progress;
     private int initialStatValue; // Track stat value when quest was accepted
 
+    public Quest(){}
+
     public Quest(String description, Reward reward) {
         this.description = description;
         this.state = QuestState.NOT_STARTED;
@@ -306,6 +308,8 @@ public class Quest {
 
         private ObjectiveType type;
         private int targetAmount;
+
+        public QuestObjective(){}
 
         public QuestObjective(ObjectiveType type, int targetAmount) {
             this.type = type;

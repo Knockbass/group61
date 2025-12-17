@@ -9,6 +9,8 @@ public class NPC {
     private Rectangle interactionArea;
     private Quest quest;
 
+    public NPC(){}
+
     public NPC(String name, float x, float y, float width, float height) {
         this.name = name;
         this.interactionArea = new Rectangle(x, y, width, height);

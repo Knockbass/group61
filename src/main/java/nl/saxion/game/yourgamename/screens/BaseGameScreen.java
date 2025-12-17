@@ -79,6 +79,10 @@ public abstract class BaseGameScreen extends GameScreen {
         return this.camera;
     }
 
+    public Viewport getViewport(){
+        return this.viewport;
+    }
+
     private void snapCameraToTarget() {
         float halfViewportWidth = (viewport.getWorldWidth() / 2f) * camera.zoom;
         float halfViewportHeight = (viewport.getWorldHeight() / 2f) * camera.zoom;
@@ -123,5 +127,13 @@ public abstract class BaseGameScreen extends GameScreen {
 
     public float getScreenHeight() {
         return com.badlogic.gdx.Gdx.graphics.getHeight();
+    }
+
+    public void setCamera(OrthographicCamera camera){
+        this.camera = camera;
+    }
+
+    public void setViewport(Viewport viewport){
+        this.viewport = viewport;
     }
 }

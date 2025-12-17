@@ -202,4 +202,15 @@ public class EnemySpawner {
             }
         }
     }
+
+    public void removeAllEnemies(){
+        for (int i = enemies.size() - 1; i >= 0; i--) {
+            Yapper yapper = enemies.get(i);
+            enemies.remove(i);
+
+            // Remove from collision system
+            CollisionManager.collidableEntities.remove(yapper);
+            CollisionManager.dynamic.remove(yapper);
+            }
+        }
 }

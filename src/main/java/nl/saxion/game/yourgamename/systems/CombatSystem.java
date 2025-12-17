@@ -50,8 +50,8 @@ public class CombatSystem {
 
 
     public void updateAttackHitbox(Player player) {
-        int rectWidth = 50;
-        int rectHeight = 50;
+        int rectWidth = 25;
+        int rectHeight = 25;
 
         int centerX = player.getX() + player.getWidth() / 2 - rectWidth / 2;
         int centerY = player.getY() + player.getHeight() / 2 - rectHeight / 2;

@@ -15,6 +15,8 @@ public class Player extends CombatEntity implements Collidable {
     public boolean hasHitEnemy;
     private StatSystem statSystem = new StatSystem();
 
+    public Player(){}
+
     public Player(String name, int movementSpeed) {
         super.name = name;
         super.entityWidth = 16;  // Match map tile width (16px)

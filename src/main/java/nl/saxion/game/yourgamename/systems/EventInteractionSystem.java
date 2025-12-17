@@ -179,4 +179,9 @@ public class EventInteractionSystem {
             return area;
         }
     }
+
+    public void setPlayer(Player player){
+        this.player = player;
+        quizSystem.setPlayer(player);
+    }
 }

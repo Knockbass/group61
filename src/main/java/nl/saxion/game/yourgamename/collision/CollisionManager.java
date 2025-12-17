@@ -65,5 +65,10 @@ public class CollisionManager {
         return GameApp.rectOverlap(attacker.hitbox.x, attacker.hitbox.y, attacker.hitbox.width, attacker.hitbox.height,
                 receiver.position.getX(), receiver.position.getY(), receiver.entityWidth, receiver.entityHeight);
     }
+
+    public static void clear(){
+        CollisionManager.collidableEntities.clear();
+        CollisionManager.dynamic.clear();
+    }
 }
 

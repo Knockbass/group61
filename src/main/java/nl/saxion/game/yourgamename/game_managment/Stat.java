@@ -5,6 +5,8 @@ public class Stat {
     private int baseValue;
     private int currentValue;
 
+    public Stat(){}
+
     public Stat(int baseValue){
         this.baseValue = baseValue;
         this.currentValue = baseValue;

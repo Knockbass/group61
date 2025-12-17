@@ -5,12 +5,13 @@ import com.badlogic.gdx.maps.MapObjects;
 import nl.saxion.game.yourgamename.collision.*;
 import nl.saxion.game.yourgamename.game_managment.*;
 import nl.saxion.game.yourgamename.movement.*;
-import nl.saxion.game.yourgamename.systems.CombatSystem;
-import nl.saxion.game.yourgamename.systems.EventInteractionSystem;
-import nl.saxion.game.yourgamename.systems.NPCSystem;
-import nl.saxion.game.yourgamename.systems.StudyQuizSystem;
+import nl.saxion.game.yourgamename.systems.*;
 import nl.saxion.gameapp.GameApp;
 import nl.saxion.game.yourgamename.entities.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class YourGameScreen extends BaseGameScreen {
     public static int worldWidth = 1920;        //world size
@@ -24,6 +25,8 @@ public class YourGameScreen extends BaseGameScreen {
     private CombatSystem combatSystem;
     private NPCSystem npcSystem;
     private EventInteractionSystem eventSystem;
+    private DataStorage dataStorage;
+    private SaveLoadSystem saveLoadSystem;
 
     public YourGameScreen() {
         super(viewportWidth, viewportHeight, worldWidth, worldHeight);
@@ -49,6 +52,7 @@ public class YourGameScreen extends BaseGameScreen {
         combatSystem = new CombatSystem();
         npcSystem = new NPCSystem(player);
         eventSystem = new EventInteractionSystem(player);
+        saveLoadSystem = new SaveLoadSystem(dataStorage);
 
         // Load NPCs from Events object layer
         MapObjects eventObjects = world.getObjectLayer("Events").getObjects();
@@ -65,6 +69,26 @@ public class YourGameScreen extends BaseGameScreen {
 
     @Override
     public void render(float delta) {
+        // Save/load
+        if (GameApp.isKeyPressed(Input.Keys.CONTROL_LEFT) && GameApp.isKeyJustPressed(Input.Keys.O)){
+            dataStorage = new DataStorage(player, npcSystem);
+            saveLoadSystem = new SaveLoadSystem(dataStorage);
+            saveLoadSystem.saveGame();
+            System.out.println("Saved");
+        } else if(GameApp.isKeyPressed(Input.Keys.CONTROL_LEFT) && GameApp.isKeyJustPressed(Input.Keys.P)){
+            enemySpawner.removeAllEnemies();
+            dataStorage = saveLoadSystem.loadGame();
+            player = dataStorage.player;
+            npcSystem = dataStorage.npcSystem;
+            npcSystem.setPlayer(player);
+            eventSystem.setPlayer(player);
+
+            CollisionManager.clear();
+            CollisionManager.addMapObjects(world.getObjectLayer("Collisions").getObjects());
+            CollisionManager.addEntity(player);
+
+            System.out.println("Loaded");
+        }
         // Update quiz system
         StudyQuizSystem quizSystem = eventSystem.getQuizSystem();
         quizSystem.update(delta);
@@ -120,6 +144,7 @@ public class YourGameScreen extends BaseGameScreen {
             if (!npcSystem.interactWithNearbyNPC(50f)) {
                 // Check for event interaction (like UniEntrance) - increased range to 100
                 eventSystem.interactWithNearbyEvent(100f);
+                player.accessStatSystem().dringBeer();
             }
         }
 
@@ -184,6 +209,6 @@ public class YourGameScreen extends BaseGameScreen {
         GameApp.disposeSpritesheet("idle");
         GameApp.disposeAnimation("idleAnim");
         GameApp.disposeTexture("quizBackground");
-        //GameApp.disposeTexture("enemy");
+        GameApp.disposeTexture("enemy");
     }
 }

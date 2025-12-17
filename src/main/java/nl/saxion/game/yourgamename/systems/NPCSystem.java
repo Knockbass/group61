@@ -20,6 +20,8 @@ public class NPCSystem {
     private float completedQuestDisplayTime = 0f; // Timer to auto-clear completed quest display
     private static final float COMPLETED_QUEST_DISPLAY_DURATION = 5f; // Show for 5 seconds
 
+    public NPCSystem(){}
+
     public NPCSystem(Player player) {
         this.npcs = new ArrayList<>();
         this.player = player;
@@ -225,6 +227,10 @@ public class NPCSystem {
             System.err.println("Error rendering NPC interaction prompt: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    public void setPlayer(Player player){
+        this.player = player;
     }
 }
 
