@@ -59,7 +59,7 @@ public class YourGameScreen extends BaseGameScreen {
         enemySpawner = new EnemySpawner(worldWidth, worldHeight);
         combatSystem = new CombatSystem();
         npcSystem = new NPCSystem(player);
-        eventSystem = new EventInteractionSystem(player);
+        eventSystem = new EventInteractionSystem(player, world, npcSystem, enemySpawner);
         saveLoadSystem = new SaveLoadSystem(dataStorage);
 
         // Load NPCs from Events object layer
@@ -227,6 +227,7 @@ public class YourGameScreen extends BaseGameScreen {
         eventSystem.renderInteractionPrompt(50f);
         GameApp.endSpriteRendering();
     }
+
 
     @Override
     public void hide() {

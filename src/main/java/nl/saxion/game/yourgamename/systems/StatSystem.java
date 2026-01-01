@@ -132,4 +132,12 @@ public class StatSystem {
     public int getBeerCount() {
         return beerCount.get();
     }
+
+    public void setMoney(int money){
+        this.money.setCurrentValue(money);
+    }
+
+    public void setBeerCount(int beerCount){
+        this.beerCount.setCurrentValue(beerCount);
+    }
 }

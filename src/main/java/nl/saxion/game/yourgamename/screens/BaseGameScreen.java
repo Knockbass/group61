@@ -10,13 +10,13 @@ import nl.saxion.gameapp.screens.GameScreen;
 public abstract class BaseGameScreen extends GameScreen {
     protected OrthographicCamera camera;
     protected Viewport viewport;
-    private final float worldWidth, worldHeight;
+    private static float worldWidth, worldHeight;
     private float targetX, targetY;
 
     public BaseGameScreen(float viewportWidth, float viewportHeight,
                           float worldWidth, float worldHeight){
-        this.worldWidth = worldWidth;
-        this.worldHeight = worldHeight;
+        BaseGameScreen.worldWidth = worldWidth;
+        BaseGameScreen.worldHeight = worldHeight;
         camera = new OrthographicCamera();
         viewport = new ExtendViewport(viewportWidth,viewportHeight, camera);
     }
@@ -79,10 +79,6 @@ public abstract class BaseGameScreen extends GameScreen {
         return this.camera;
     }
 
-    public Viewport getViewport(){
-        return this.viewport;
-    }
-
     private void snapCameraToTarget() {
         float halfViewportWidth = (viewport.getWorldWidth() / 2f) * camera.zoom;
         float halfViewportHeight = (viewport.getWorldHeight() / 2f) * camera.zoom;
@@ -129,11 +125,11 @@ public abstract class BaseGameScreen extends GameScreen {
         return com.badlogic.gdx.Gdx.graphics.getHeight();
     }
 
-    public void setCamera(OrthographicCamera camera){
-        this.camera = camera;
+    public static void setWorldHeight(float worldHeight){
+        BaseGameScreen.worldHeight = worldHeight;
     }
 
-    public void setViewport(Viewport viewport){
-        this.viewport = viewport;
+    public static void setWorldWidth(float worldWidth){
+        BaseGameScreen.worldWidth = worldWidth;
     }
 }

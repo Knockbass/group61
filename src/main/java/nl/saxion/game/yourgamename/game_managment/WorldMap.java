@@ -7,36 +7,26 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 public class WorldMap {
 
-    private final TiledMap map;
-    private final OrthogonalTiledMapRenderer renderer;
+    private TiledMap map;
+    private OrthogonalTiledMapRenderer renderer;
+    private int mapType;
 
     public WorldMap(String mapPath) {
         map = new TmxMapLoader().load(mapPath);
         renderer = new OrthogonalTiledMapRenderer(map, 1f);
+        mapType = 0;
     }
 
-    private final int[] layersBelowPlayer = {
-            0, // grass
-            1, // water
-            2, // island_ground
-            3, // island_decoration
-            5, // walls
-            6, // road
-            7, // grass_decor
-            9, // floor
-            10,  // uni_borders
-            11,  // buildings
-            12, // decorations
-            13, // ships
-            14, // ships_flag
-            15 // market_area
+    private final int[][] layersBelowPlayer = {
+            {0, 1, 2, 3, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15}, // open world
+            {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},               // first floor
+            {}                                                // second floor
     };
 
-    private final int[] layersAbovePlayer = {
-            4,  // trees
-            8,  // trees_overlap
-            16, // roofs
-            17  // shadows
+    private final int[][] layersAbovePlayer = {
+            { 4, 8, 16, 17 },  // open world
+            {               }, // first floor (no layers above)
+            {               }  // second floor (no layers above)
     };
 
     public void dispose() {
@@ -44,25 +34,54 @@ public class WorldMap {
         renderer.dispose();
     }
 
-    public MapLayer getObjectLayer(String layerName){
+    public MapLayer getObjectLayer(String layerName) {
         MapLayer collisionLayer;
         return collisionLayer = map.getLayers().get(layerName);
     }
 
 
-    public int[] getLayersBelowPlayer(){
-        return layersBelowPlayer;
+    public int[] getLayersBelowPlayer() {   // 0 for open world
+        // 1 for first floor
+        // 2 for second floor
+        return switch (mapType) {
+            case 0 -> layersBelowPlayer[0];
+            case 1 -> layersBelowPlayer[1];
+            case 2 -> layersBelowPlayer[2];
+            default -> {
+                System.out.println("Problem occured with map type during retaining layers");
+                yield null;
+            }
+        };
     }
 
-    public int[] getLayersAbovePlayer(){
-        return layersAbovePlayer;
+    public int[] getLayersAbovePlayer() {    // 0 for open world
+        // 1 for first floor
+        // 2 for second floor
+        return switch (mapType) {
+            case 0 -> layersAbovePlayer[0];
+            case 1 -> layersAbovePlayer[1];
+            case 2 -> layersAbovePlayer[2];
+            default -> {
+                System.out.println("Problem occured with map type during retaining layers");
+                yield null;
+            }
+        };
     }
 
-    public TiledMap getMap(){
+    public TiledMap getMap() {
         return this.map;
     }
 
-    public OrthogonalTiledMapRenderer getRenderer(){
+    public OrthogonalTiledMapRenderer getRenderer() {
         return renderer;
+    }
+
+    public void setMap(String mapPath) {
+        map = new TmxMapLoader().load(mapPath);
+        renderer = new OrthogonalTiledMapRenderer(map, 1f);
+    }
+
+    public void setMapType(int mapType) {
+        this.mapType = mapType;
     }
 }
