@@ -1,14 +1,17 @@
 package nl.saxion.game.yourgamename.systems;
 
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
 import nl.saxion.game.yourgamename.collision.CollisionManager;
 import nl.saxion.game.yourgamename.entities.Player;
 import nl.saxion.game.yourgamename.game_managment.EnemySpawner;
 import nl.saxion.game.yourgamename.game_managment.WorldMap;
-import nl.saxion.game.yourgamename.screens.BaseGameScreen;
 import nl.saxion.game.yourgamename.screens.YourGameScreen;
 import nl.saxion.gameapp.GameApp;
 
@@ -33,6 +36,8 @@ public class EventInteractionSystem {
     }
 
     public void loadEventsFromMap(MapObjects mapObjects) {
+        // Important: this system persists across map switches, so always clear first to avoid "old floor" events leaking.
+        eventAreas.clear();
         System.out.println("Loading events from map. Total objects: " + mapObjects.getCount());
         for (MapObject mapObject : mapObjects) {
             if (mapObject instanceof RectangleMapObject rectObject) {
@@ -102,7 +107,8 @@ public class EventInteractionSystem {
         System.out.println("Event interaction triggered: " + eventName);
 
         if (eventName.equals("UniEntrance")) {
-            switchScreens(960, 640, "maps/first floor map 1/first floor.tmx", 1);
+            // Enter university (first floor)
+            switchScreens(960, 640, "maps/first floor map 1/first floor.tmx", 1, "SpawnPoint1");
             // Start quiz instead of direct study
   /*          if (!quizSystem.isActive()) {
                 System.out.println("Starting quiz...");
@@ -124,7 +130,14 @@ public class EventInteractionSystem {
                     }
     */
         } else if (eventName.equals("exit")) {
-            switchScreens(1920, 1440, "maps/map.tmx", 0);
+            // Exit university back to the open world, spawn outside the university
+            switchScreens(1920, 1440, "maps/map.tmx", 0, "uniout");
+        } else if (eventName.equals("MoveToSecondFloor")) {
+            // Go upstairs
+            switchScreens(960, 640, "maps/second floor map/second_floor.tmx", 2, "SpawnPoint2");
+        } else if (eventName.equals("MoveToFirstFloor")) {
+            // Go downstairs (spawn near the staircase trigger on the first floor)
+            switchScreens(960, 640, "maps/first floor map 1/first floor.tmx", 1, "SpawnPoint1");
         } else if (eventName.equals("buyable_area")) {
             int beerPrice = 5;
 
@@ -140,6 +153,14 @@ public class EventInteractionSystem {
             int newDay = stats.getCurrentDay();
             System.out.println("Player slept! Day advanced from " + currentDay + " to " + newDay);
             System.out.println("Mental Health and Energy restored!");
+        } else if (eventName.equals("Study")) {
+            // Start study quiz
+            if (quizSystem.canStartQuiz()) {
+                System.out.println("Starting study quiz...");
+                quizSystem.startQuiz();
+            } else {
+                System.out.println("Study quiz already completed today (or already active).");
+            }
         } else {
             System.out.println("Event name '" + eventName + "' does not match known events");
         }
@@ -149,7 +170,7 @@ public class EventInteractionSystem {
         return quizSystem;
     }
 
-    public void renderInteractionPrompt(float interactionRange) {
+    public void renderInteractionPrompt(float interactionRange, OrthographicCamera worldCamera, float screenWidth, float screenHeight) {
         try {
             EventArea nearbyEvent = getNearbyEvent(interactionRange);
             if (nearbyEvent != null) {
@@ -172,20 +193,36 @@ public class EventInteractionSystem {
                     descriptionText = "Restore Energy & Mental Health (Next Day)";
                 } else if (eventName.equals("MoveToSecondFloor")) {
                     promptText = "Press E to move to next floor";
-                    descriptionText = "Buy beer for 5 coins";
+                } else if (eventName.equals("MoveToFirstFloor")) {
+                    promptText = "Press E to move to previous floor";
+                } else if (eventName.equals("Study")) {
+                    promptText = "Press E to Study";
+                    if (quizSystem.canStartQuiz()) {
+                        descriptionText = "Take Quiz (4 questions)";
+                    } else {
+                        descriptionText = "Quiz already completed today";
+                    }
                 }
 
                 if (!promptText.isEmpty()) {
-                    // Position text above the player (in world coordinates)
+                    // Position text above the player, but render in screen space and clamp to screen bounds.
                     float playerCenterX = player.getX() + player.getWidth() / 2f;
-                    float textY = player.getY() + player.getHeight() + 35f;
+                    float worldTextY = player.getY() + player.getHeight() + 35f;
+                    Vector3 screenPos = worldCamera.project(new Vector3(playerCenterX, worldTextY, 0));
+
+                    float marginX = 12f;
+                    float marginY = 18f;
+                    float x = MathUtils.clamp(screenPos.x, marginX, screenWidth - marginX);
+                    float baseY = MathUtils.clamp(screenPos.y, marginY, screenHeight - marginY);
                     float lineHeight = 22f;
 
                     // Display interaction prompt above player (horizontally centered, using hud font for same style)
-                    GameApp.drawTextHorizontallyCentered("hud", promptText, playerCenterX, textY + lineHeight, "white");
+                    float y1 = MathUtils.clamp(baseY + lineHeight, marginY, screenHeight - marginY);
+                    float y0 = MathUtils.clamp(baseY, marginY, screenHeight - marginY);
+                    GameApp.drawTextHorizontallyCentered("hud", promptText, (int) x, (int) y1, "white");
 
                     if (!descriptionText.isEmpty()) {
-                        GameApp.drawTextHorizontallyCentered("hud", descriptionText, playerCenterX, textY, "yellow-500");
+                        GameApp.drawTextHorizontallyCentered("hud", descriptionText, (int) x, (int) y0, "yellow-500");
                     }
                 }
             }
@@ -220,6 +257,10 @@ public class EventInteractionSystem {
     }
 
     public void switchScreens(int newWorldWidth, int newWorldHeight, String newMapPath, int mapType) {
+        switchScreens(newWorldWidth, newWorldHeight, newMapPath, mapType, null);
+    }
+
+    public void switchScreens(int newWorldWidth, int newWorldHeight, String newMapPath, int mapType, String spawnObjectName) {
         //change main variables of the world
         YourGameScreen.setWorldWidth(newWorldWidth);
         YourGameScreen.setWorldHeight(newWorldHeight);
@@ -228,20 +269,34 @@ public class EventInteractionSystem {
         world.setMap(newMapPath);
         world.setMapType(mapType);
 
-        //place player in the correct position on the screen
-        switch (mapType) {
-            case 0:
-                player.setX(200);
-                player.setY(YourGameScreen.worldHeight - player.entityHeight - 281);
-                break;
-            case 1:
-                player.setX(466);
-                player.setY(YourGameScreen.worldHeight - player.entityHeight - 576);
-                break;
-            case 2:
-                player.setX(0);
-                player.setY(0);
-                break;
+        // Place player based on a named rectangle object (preferred), falling back to hardcoded defaults.
+        String fallbackSpawnName = switch (mapType) {
+            case 1 -> "SpawnPoint1";
+            case 2 -> "SpawnPoint2";
+            default -> null;
+        };
+
+        // Prefer named spawn rectangles in the Spawns layer (SpawnPoint1/2, uniout, etc.)
+        boolean placed = tryPlacePlayerAtObject("Spawns", spawnObjectName)
+                || tryPlacePlayerAtObject("Events", spawnObjectName)
+                || (spawnObjectName == null && fallbackSpawnName != null && tryPlacePlayerAtObject("Spawns", fallbackSpawnName));
+
+        if (!placed) {
+            //place player in the correct position on the screen
+            switch (mapType) {
+                case 0:
+                    player.setX(200);
+                    player.setY(YourGameScreen.worldHeight - player.entityHeight - 281);
+                    break;
+                case 1:
+                    player.setX(466);
+                    player.setY(YourGameScreen.worldHeight - player.entityHeight - 576);
+                    break;
+                case 2:
+                    player.setX(466);
+                    player.setY(YourGameScreen.worldHeight - player.entityHeight - 576);
+                    break;
+            }
         }
 
         player.collisionBox.x = player.getX() + 2;
@@ -261,5 +316,28 @@ public class EventInteractionSystem {
         // Load YapperSpawn areas from Spawns object layer
         MapObjects spawnObjects = world.getObjectLayer("Spawns").getObjects();
         enemySpawner.loadSpawnAreasFromMap(spawnObjects);
+    }
+
+    private boolean tryPlacePlayerAtObject(String layerName, String objectName) {
+        if (objectName == null) return false;
+        MapLayer layer = world.getObjectLayer(layerName);
+        if (layer == null) return false;
+
+        MapObjects objects = layer.getObjects();
+        for (MapObject obj : objects) {
+            if (obj instanceof RectangleMapObject rectObj
+                    && obj.getName() != null
+                    && objectName.equalsIgnoreCase(obj.getName())) {
+                Rectangle rect = rectObj.getRectangle();
+                // libGDX's TmxMapLoader already provides object coordinates in the game's coordinate system.
+                // So we should NOT "flip Y" here; doing so would place spawns at the wrong side of the map.
+                int spawnX = (int) (rect.x + (rect.width / 2f) - (player.getWidth() / 2f));
+                int spawnY = (int) (rect.y + (rect.height / 2f) - (player.getHeight() / 2f));
+                player.setX(spawnX);
+                player.setY(spawnY);
+                return true;
+            }
+        }
+        return false;
     }
 }

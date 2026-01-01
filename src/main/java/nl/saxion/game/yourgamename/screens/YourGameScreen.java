@@ -1,17 +1,15 @@
 package nl.saxion.game.yourgamename.screens;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.math.Matrix4;
 import nl.saxion.game.yourgamename.collision.*;
 import nl.saxion.game.yourgamename.game_managment.*;
 import nl.saxion.game.yourgamename.movement.*;
 import nl.saxion.game.yourgamename.systems.*;
 import nl.saxion.gameapp.GameApp;
 import nl.saxion.game.yourgamename.entities.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class YourGameScreen extends BaseGameScreen {
     public static int worldWidth = 1920;        //world size
@@ -27,6 +25,7 @@ public class YourGameScreen extends BaseGameScreen {
     private EventInteractionSystem eventSystem;
     private DataStorage dataStorage;
     private SaveLoadSystem saveLoadSystem;
+    private OrthographicCamera hudCamera;
 
     public YourGameScreen() {
         super(viewportWidth, viewportHeight, worldWidth, worldHeight);
@@ -219,13 +218,25 @@ public class YourGameScreen extends BaseGameScreen {
     }
 
     private void renderInteractionPrompts() {
-        // Render interaction prompts in a separate sprite batch so they appear on top of all map layers
+        // Render interaction prompts in screen-space (pixel perfect) so text stays crisp and can be clamped on-screen.
+        float screenWidth = getScreenWidth();
+        float screenHeight = getScreenHeight();
+
+        if (hudCamera == null) {
+            hudCamera = new OrthographicCamera();
+        }
+        hudCamera.setToOrtho(false, screenWidth, screenHeight);
+        hudCamera.update();
+
+        Matrix4 oldProjection = GameApp.getSpriteBatch().getProjectionMatrix().cpy();
+        GameApp.getSpriteBatch().setProjectionMatrix(hudCamera.combined);
+
         GameApp.startSpriteRendering();
-        // Render NPC interaction prompt
-        npcSystem.renderInteractionPrompt(50f);
-        // Render event interaction prompt (like UniEntrance)
-        eventSystem.renderInteractionPrompt(50f);
+        npcSystem.renderInteractionPrompt(50f, getCamera(), screenWidth, screenHeight);
+        eventSystem.renderInteractionPrompt(50f, getCamera(), screenWidth, screenHeight);
         GameApp.endSpriteRendering();
+
+        GameApp.getSpriteBatch().setProjectionMatrix(oldProjection);
     }
 
 

@@ -1,9 +1,12 @@
 package nl.saxion.game.yourgamename.systems;
 
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
 import nl.saxion.game.yourgamename.entities.NPC;
 import nl.saxion.game.yourgamename.entities.Player;
 import nl.saxion.game.yourgamename.game_managment.Quest;
@@ -170,16 +173,22 @@ public class NPCSystem {
         return npcs;
     }
 
-    public void renderInteractionPrompt(float interactionRange) {
+    public void renderInteractionPrompt(float interactionRange, OrthographicCamera worldCamera, float screenWidth, float screenHeight) {
         try {
             NPC nearbyNPC = getNearbyNPC(interactionRange);
             if (nearbyNPC != null && nearbyNPC.hasQuest()) {
                 Quest quest = nearbyNPC.getQuest();
                 if (quest == null) return;
                 
-                // Position text above the player (in world coordinates)
+                // Position text above the player, but render in screen space and clamp to screen bounds.
                 float playerCenterX = player.getX() + player.getWidth() / 2f;
-                float textY = player.getY() + player.getHeight() + 35f;
+                float worldTextY = player.getY() + player.getHeight() + 35f;
+                Vector3 screenPos = worldCamera.project(new Vector3(playerCenterX, worldTextY, 0));
+
+                float marginX = 12f;
+                float marginY = 18f;
+                float x = MathUtils.clamp(screenPos.x, marginX, screenWidth - marginX);
+                float baseY = MathUtils.clamp(screenPos.y, marginY, screenHeight - marginY);
                 float lineHeight = 22f;
                 
                 // Note: startSpriteRendering/endSpriteRendering should be called by the caller
@@ -187,7 +196,8 @@ public class NPCSystem {
                 
                 // Display interaction prompt above player (horizontally centered, using hud font for same style)
                 String promptText = "Press E to interact with NPC";
-                GameApp.drawTextHorizontallyCentered("hud", promptText, playerCenterX, textY + (lineHeight * 2), "white");
+                float y2 = MathUtils.clamp(baseY + (lineHeight * 2), marginY, screenHeight - marginY);
+                GameApp.drawTextHorizontallyCentered("hud", promptText, (int) x, (int) y2, "white");
                 
                 if (quest.isNotStarted()) {
                     // Show quest description if not started
@@ -200,26 +210,33 @@ public class NPCSystem {
                             if (spaceIndex > 0) midPoint = spaceIndex;
                             String part1 = questText.substring(0, midPoint);
                             String part2 = questText.substring(midPoint).trim();
-                            GameApp.drawTextHorizontallyCentered("hud", part1, playerCenterX, textY + lineHeight, "yellow-500");
-                            GameApp.drawTextHorizontallyCentered("hud", part2, playerCenterX, textY, "yellow-500");
+                            float y1 = MathUtils.clamp(baseY + lineHeight, marginY, screenHeight - marginY);
+                            float y0 = MathUtils.clamp(baseY, marginY, screenHeight - marginY);
+                            GameApp.drawTextHorizontallyCentered("hud", part1, (int) x, (int) y1, "yellow-500");
+                            GameApp.drawTextHorizontallyCentered("hud", part2, (int) x, (int) y0, "yellow-500");
                         } else {
-                            GameApp.drawTextHorizontallyCentered("hud", questText, playerCenterX, textY + lineHeight, "yellow-500");
-                            GameApp.drawTextHorizontallyCentered("hud", "Press E to accept quest", playerCenterX, textY, "cyan-400");
+                            float y1 = MathUtils.clamp(baseY + lineHeight, marginY, screenHeight - marginY);
+                            float y0 = MathUtils.clamp(baseY, marginY, screenHeight - marginY);
+                            GameApp.drawTextHorizontallyCentered("hud", questText, (int) x, (int) y1, "yellow-500");
+                            GameApp.drawTextHorizontallyCentered("hud", "Press E to accept quest", (int) x, (int) y0, "cyan-400");
                         }
                     }
                 } else if (quest.isActive()) {
                     // Update and show progress if quest is active
                     quest.checkObjective(player);
                     String progressText = "Progress: " + quest.getProgressText();
-                    GameApp.drawTextHorizontallyCentered("hud", progressText, playerCenterX, textY + lineHeight, "cyan-400");
+                    float y1 = MathUtils.clamp(baseY + lineHeight, marginY, screenHeight - marginY);
+                    float y0 = MathUtils.clamp(baseY, marginY, screenHeight - marginY);
+                    GameApp.drawTextHorizontallyCentered("hud", progressText, (int) x, (int) y1, "cyan-400");
                     if (quest.checkObjective(player)) {
-                        GameApp.drawTextHorizontallyCentered("hud", "Press E to complete quest", playerCenterX, textY, "green-400");
+                        GameApp.drawTextHorizontallyCentered("hud", "Press E to complete quest", (int) x, (int) y0, "green-400");
                     } else {
                         String objectiveText = "Need " + quest.getObjective().getTargetAmount() + " " + quest.getObjective().getTypeName();
-                        GameApp.drawTextHorizontallyCentered("hud", objectiveText, playerCenterX, textY, "white");
+                        GameApp.drawTextHorizontallyCentered("hud", objectiveText, (int) x, (int) y0, "white");
                     }
                 } else if (quest.isCompleted()) {
-                    GameApp.drawTextHorizontallyCentered("hud", "Quest completed!", playerCenterX, textY + lineHeight, "green-400");
+                    float y1 = MathUtils.clamp(baseY + lineHeight, marginY, screenHeight - marginY);
+                    GameApp.drawTextHorizontallyCentered("hud", "Quest completed!", (int) x, (int) y1, "green-400");
                 }
             }
         } catch (Exception e) {
