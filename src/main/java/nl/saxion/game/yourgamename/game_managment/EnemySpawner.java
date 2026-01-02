@@ -25,13 +25,15 @@ public class EnemySpawner {
     private List<Rectangle> spawnAreas = new ArrayList<>(); // YapperSpawn areas from map
     private Random random = new Random();
 
+    private Player player;
     private int worldWidth;
     private int worldHeight;
 
 
-    public EnemySpawner(float worldWidth, float worldHeight) {
+    public EnemySpawner(float worldWidth, float worldHeight, Player player) {
         this.worldWidth = (int) worldWidth;
         this.worldHeight = (int) worldHeight;
+        this.player = player;
     }
 
     public void loadSpawnAreasFromMap(MapObjects mapObjects) {
@@ -178,6 +180,8 @@ public class EnemySpawner {
             Yapper yapper = enemies.get(i);
             if (yapper.isDead) {
                 enemies.remove(i);
+                player.accessStatSystem().setKilledYappersAmount(player.accessStatSystem().getKilledYappersAmount() + 1);
+
 
                 // Remove from collision system
                 CollisionManager.collidableEntities.remove(yapper);

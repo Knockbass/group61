@@ -12,6 +12,7 @@ public class StatSystem {
     private Stat energy = new Stat(100);        //idk
     private Stat hp = new Stat(100);            //player's hp
     private Stat beerCount = new Stat(1);
+    private Stat killedYappersAmount = new Stat(0);
     private int currentDay = 1;                 // Track current day (increments when sleeping)
 
     //increase mental health and energy
@@ -104,6 +105,8 @@ public class StatSystem {
         return this.knowledge.getBaseValue();
     }
 
+    public int getKilledYappersAmount(){return this.killedYappersAmount.getBaseValue();}
+
     // Getters for Stat objects (used by NPCSystem for rewards)
     public Stat getKnowledgeStat() {
         return knowledge;
@@ -125,9 +128,11 @@ public class StatSystem {
         return hp;
     }
 
+
     public Stat getBeerCountStat() {
         return beerCount;
     }
+
 
     public int getBeerCount() {
         return beerCount.get();
@@ -140,4 +145,7 @@ public class StatSystem {
     public void setBeerCount(int beerCount){
         this.beerCount.setCurrentValue(beerCount);
     }
+
+    public void setKilledYappersAmount(int killedYappersAmount){this.killedYappersAmount.setCurrentValue(killedYappersAmount);}
+
 }

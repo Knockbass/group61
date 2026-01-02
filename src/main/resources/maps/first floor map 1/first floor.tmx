@@ -522,7 +522,7 @@
   <object id="24" x="208" y="480" width="132" height="32"/>
   <object id="25" x="332" y="240" width="8" height="244"/>
   <object id="26" x="32" y="240" width="300" height="32"/>
-  <object id="27" name="buyable_area" x="132" y="292" width="76" height="28"/>
+  <object id="27" x="132" y="292" width="76" height="28"/>
   <object id="28" x="196" y="276" width="8" height="16"/>
   <object id="29" x="132" y="276" width="8" height="20"/>
   <object id="30" x="52" y="272" width="56" height="12"/>
@@ -556,6 +556,6 @@
  <objectgroup id="12" name="Events">
   <object id="52" name="exit" x="450.898" y="597.444" width="64" height="32"/>
   <object id="54" name="MoveToSecondFloor" x="460" y="20" width="40" height="32"/>
-  <object id="57" x="128" y="308" width="80" height="40"/>
+  <object id="57" name="BuyableArea" x="128" y="308" width="80" height="40"/>
  </objectgroup>
 </map>

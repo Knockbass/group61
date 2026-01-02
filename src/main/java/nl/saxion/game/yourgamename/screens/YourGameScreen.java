@@ -7,6 +7,8 @@ import com.badlogic.gdx.math.Matrix4;
 import nl.saxion.game.yourgamename.collision.*;
 import nl.saxion.game.yourgamename.game_managment.*;
 import nl.saxion.game.yourgamename.movement.*;
+import nl.saxion.game.yourgamename.quest_logic.Quest;
+import nl.saxion.game.yourgamename.quest_logic.StudyQuizSystem;
 import nl.saxion.game.yourgamename.systems.*;
 import nl.saxion.gameapp.GameApp;
 import nl.saxion.game.yourgamename.entities.*;
@@ -55,7 +57,7 @@ public class YourGameScreen extends BaseGameScreen {
         GameApp.addFont("default", "fonts/basic.ttf", 18);
 
         player = new Player("player", 125);
-        enemySpawner = new EnemySpawner(worldWidth, worldHeight);
+        enemySpawner = new EnemySpawner(worldWidth, worldHeight, player);
         combatSystem = new CombatSystem();
         npcSystem = new NPCSystem(player);
         eventSystem = new EventInteractionSystem(player, world, npcSystem, enemySpawner);
@@ -86,9 +88,12 @@ public class YourGameScreen extends BaseGameScreen {
             enemySpawner.removeAllEnemies();
             dataStorage = saveLoadSystem.loadGame();
             player = dataStorage.player;
+
             npcSystem = dataStorage.npcSystem;
             npcSystem.setPlayer(player);
+
             eventSystem.setPlayer(player);
+            eventSystem.setNpcSystem(npcSystem);
 
             CollisionManager.clear();
             CollisionManager.addMapObjects(world.getObjectLayer("Collisions").getObjects());
@@ -145,14 +150,19 @@ public class YourGameScreen extends BaseGameScreen {
             enemySpawner.deleteDeadEnemies();
         }
 
-        // Only allow E key interaction if quiz is not active
+        // E key - NPC and events interaction
         if (!quizSystem.isActive() && GameApp.isKeyJustPressed(Input.Keys.E)) {
             // Check for NPC interaction first (within 50 pixel range)
             if (!npcSystem.interactWithNearbyNPC(50f)) {
                 // Check for event interaction (like UniEntrance) - increased range to 100
                 eventSystem.interactWithNearbyEvent(100f);
-                player.accessStatSystem().dringBeer();
             }
+        }
+
+        // R key - Drink beer
+        if (!quizSystem.isActive() && GameApp.isKeyJustPressed(Input.Keys.R)) {
+            player.accessStatSystem().dringBeer();
+            System.out.println("Beer consumed! Remaining: " + player.accessStatSystem().getBeerCount());
         }
 
         combatSystem.updatePlayerAttack(player, delta);

@@ -8,16 +8,21 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.IntArray;
 
 public class WorldMap {
+    public enum MapType{
+        OPEN_WORLD,
+        UNI_FLOOR1,
+        UNI_FLOOR2
+    }
 
     private TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
-    private int mapType;
+    private MapType mapType;
     private int[] allTileLayerIndices;
 
     public WorldMap(String mapPath) {
         map = new TmxMapLoader().load(mapPath);
         renderer = new OrthogonalTiledMapRenderer(map, 1f);
-        mapType = 0;
+        mapType = MapType.OPEN_WORLD;
         refreshTileLayerIndices();
     }
 
@@ -47,13 +52,9 @@ public class WorldMap {
         // 1 for first floor
         // 2 for second floor
         return switch (mapType) {
-            case 0 -> layersBelowPlayer[0];
-            case 1 -> allTileLayerIndices; // render all tile layers for interior floors
-            case 2 -> allTileLayerIndices; // render all tile layers for interior floors
-            default -> {
-                System.out.println("Problem occured with map type during retaining layers");
-                yield null;
-            }
+            case OPEN_WORLD -> layersBelowPlayer[0];
+            case UNI_FLOOR1 -> allTileLayerIndices; // render all tile layers for interior floors
+            case UNI_FLOOR2 -> allTileLayerIndices; // render all tile layers for interior floors
         };
     }
 
@@ -61,14 +62,10 @@ public class WorldMap {
         // 1 for first floor
         // 2 for second floor
         return switch (mapType) {
-            case 0 -> layersAbovePlayer[0];
-            case 1 -> layersAbovePlayer[1];
-            case 2 -> layersAbovePlayer[2];
-            default -> {
-                System.out.println("Problem occured with map type during retaining layers");
-                yield null;
-            }
-        };
+            case OPEN_WORLD -> layersAbovePlayer[0];
+            case UNI_FLOOR1 -> layersAbovePlayer[1];
+            case UNI_FLOOR2 -> layersAbovePlayer[2];
+            };
     }
 
     public TiledMap getMap() {
@@ -85,7 +82,7 @@ public class WorldMap {
         refreshTileLayerIndices();
     }
 
-    public void setMapType(int mapType) {
+    public void setMapType(MapType mapType) {
         this.mapType = mapType;
     }
 

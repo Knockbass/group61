@@ -12,6 +12,10 @@ import nl.saxion.game.yourgamename.collision.CollisionManager;
 import nl.saxion.game.yourgamename.entities.Player;
 import nl.saxion.game.yourgamename.game_managment.EnemySpawner;
 import nl.saxion.game.yourgamename.game_managment.WorldMap;
+import nl.saxion.game.yourgamename.game_managment.WorldMap.MapType;
+import nl.saxion.game.yourgamename.quest_logic.Quest;
+import nl.saxion.game.yourgamename.quest_logic.StudyQuizSystem;
+import nl.saxion.game.yourgamename.quest_logic.TutorialQuestChain;
 import nl.saxion.game.yourgamename.screens.YourGameScreen;
 import nl.saxion.gameapp.GameApp;
 
@@ -25,6 +29,7 @@ public class EventInteractionSystem {
     private WorldMap world;
     private NPCSystem npcSystem;
     private EnemySpawner enemySpawner;
+    private TutorialQuestChain tutorialQuestChain;
 
     public EventInteractionSystem(Player player, WorldMap world, NPCSystem npcSystem, EnemySpawner enemySpawner) {
         this.eventAreas = new ArrayList<>();
@@ -33,6 +38,7 @@ public class EventInteractionSystem {
         this.world = world;
         this.npcSystem = npcSystem;
         this.enemySpawner = enemySpawner;
+        this.tutorialQuestChain = npcSystem.accessTutorialQuestChain();
     }
 
     public void loadEventsFromMap(MapObjects mapObjects) {
@@ -108,37 +114,20 @@ public class EventInteractionSystem {
 
         if (eventName.equals("UniEntrance")) {
             // Enter university (first floor)
-            switchScreens(960, 640, "maps/first floor map 1/first floor.tmx", 1, "SpawnPoint1");
-            // Start quiz instead of direct study
-  /*          if (!quizSystem.isActive()) {
-                System.out.println("Starting quiz...");
-                quizSystem.startQuiz();
-                if (quizSystem.isActive()) {
-                    System.out.println("Quiz started. Active: " + quizSystem.isActive());
-                } else {
-                    System.out.println("Quiz could not start - may have been completed today already");
-                }
-            } else {
-                System.out.println("Quiz already active, cannot start new one");
+            switchScreens(960, 640, "maps/first floor map 1/first floor.tmx", MapType.UNI_FLOOR1, "SpawnPoint1");
+            if (tutorialQuestChain.getCurrentQuest().getObjective().getType() == Quest.QuestObjective.ObjectiveType.ENTER_UNIVERSITY) { //quest task - enter university
+                tutorialQuestChain.getCurrentQuest().setProgress(1);
             }
-            if (quizSystem.canStartQuiz()) {
-                        promptText = "Press E to study at University";
-                        descriptionText = "Take Quiz (4 questions)";
-                    } else {
-                        promptText = "Press E to study at University";
-                        descriptionText = "Quiz already completed today";
-                    }
-    */
         } else if (eventName.equals("exit")) {
             // Exit university back to the open world, spawn outside the university
-            switchScreens(1920, 1440, "maps/map.tmx", 0, "uniout");
+            switchScreens(1920, 1440, "maps/map.tmx", MapType.OPEN_WORLD, "uniout");
         } else if (eventName.equals("MoveToSecondFloor")) {
             // Go upstairs
-            switchScreens(960, 640, "maps/second floor map/second_floor.tmx", 2, "SpawnPoint2");
+            switchScreens(960, 640, "maps/second floor map/second_floor.tmx", MapType.UNI_FLOOR2, "SpawnPoint2");
         } else if (eventName.equals("MoveToFirstFloor")) {
             // Go downstairs (spawn near the staircase trigger on the first floor)
-            switchScreens(960, 640, "maps/first floor map 1/first floor.tmx", 1, "SpawnPoint1");
-        } else if (eventName.equals("buyable_area")) {
+            switchScreens(960, 640, "maps/first floor map 1/first floor.tmx", MapType.UNI_FLOOR1, "SpawnPoint1");
+        } else if (eventName.equals("BuyableArea")) {
             int beerPrice = 5;
 
             if (player.accessStatSystem().getMoney() >= beerPrice) {
@@ -183,7 +172,7 @@ public class EventInteractionSystem {
                 } else if (eventName.equals("Sleep")) {
                     promptText = "Press E to Sleep";
                     descriptionText = "Restore Energy & Mental Health (Next Day)";
-                } else if (eventName.equals("buyable_area")) {
+                } else if (eventName.equals("BuyableArea")) {
                     promptText = "Press E to buy beer";
                     descriptionText = "Buy beer for 5 coins";           //should be changed manually according to the beer price
                 } else if (eventName.equals("exit")) {
@@ -256,11 +245,11 @@ public class EventInteractionSystem {
         quizSystem.setPlayer(player);
     }
 
-    public void switchScreens(int newWorldWidth, int newWorldHeight, String newMapPath, int mapType) {
+    public void switchScreens(int newWorldWidth, int newWorldHeight, String newMapPath, MapType mapType) {
         switchScreens(newWorldWidth, newWorldHeight, newMapPath, mapType, null);
     }
 
-    public void switchScreens(int newWorldWidth, int newWorldHeight, String newMapPath, int mapType, String spawnObjectName) {
+    public void switchScreens(int newWorldWidth, int newWorldHeight, String newMapPath, MapType mapType, String spawnObjectName) {
         //change main variables of the world
         YourGameScreen.setWorldWidth(newWorldWidth);
         YourGameScreen.setWorldHeight(newWorldHeight);
@@ -271,8 +260,8 @@ public class EventInteractionSystem {
 
         // Place player based on a named rectangle object (preferred), falling back to hardcoded defaults.
         String fallbackSpawnName = switch (mapType) {
-            case 1 -> "SpawnPoint1";
-            case 2 -> "SpawnPoint2";
+            case UNI_FLOOR1 -> "SpawnPoint1";
+            case UNI_FLOOR2 -> "SpawnPoint2";
             default -> null;
         };
 
@@ -284,15 +273,15 @@ public class EventInteractionSystem {
         if (!placed) {
             //place player in the correct position on the screen
             switch (mapType) {
-                case 0:
+                case OPEN_WORLD:
                     player.setX(200);
                     player.setY(YourGameScreen.worldHeight - player.entityHeight - 281);
                     break;
-                case 1:
+                case UNI_FLOOR1:
                     player.setX(466);
                     player.setY(YourGameScreen.worldHeight - player.entityHeight - 576);
                     break;
-                case 2:
+                case UNI_FLOOR2:
                     player.setX(466);
                     player.setY(YourGameScreen.worldHeight - player.entityHeight - 576);
                     break;
@@ -339,5 +328,10 @@ public class EventInteractionSystem {
             }
         }
         return false;
+    }
+
+    public void setNpcSystem(NPCSystem npcSystem) {
+        this.npcSystem = npcSystem;
+        this.tutorialQuestChain = this.npcSystem.accessTutorialQuestChain();
     }
 }

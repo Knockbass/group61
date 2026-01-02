@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="60" height="40" tilewidth="16" tileheight="16" infinite="0" nextlayerid="18" nextobjectid="72">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="60" height="40" tilewidth="16" tileheight="16" infinite="0" nextlayerid="18" nextobjectid="97">
  <tileset firstgid="1" source="used_tilesets/_overview00.tsx"/>
  <tileset firstgid="1953" source="used_tilesets/4 BigSet.tsx"/>
  <tileset firstgid="2169" source="used_tilesets/atlas_16x.tsx"/>
@@ -176,7 +176,6 @@
   <object id="47" x="42.348" y="497.589"/>
   <object id="48" x="42.348" y="484.649"/>
   <object id="49" x="68.2273" y="524.644"/>
-  <object id="50" x="39.9953" y="354.076" width="145.865" height="19.9976"/>
   <object id="53" x="31.761" y="351.723" width="157.629" height="30.5846"/>
   <object id="54" x="224.679" y="351.723" width="205.858" height="29.4083"/>
   <object id="55" x="417.598" y="31.761" width="15.2923" height="318.786"/>
@@ -184,14 +183,28 @@
   <object id="59" x="752.853" y="319.962" width="178.802" height="32.9373"/>
   <object id="60" x="529.349" y="318.786" width="191.742" height="31.761"/>
   <object id="61" x="530.526" y="31.761" width="12.9397" height="292.907"/>
-  <object id="63" x="136.733" y="254.593" width="27.6822" height="96.8878"/>
   <object id="64" x="164.835" y="253.754" width="113.665" height="35.6514"/>
-  <object id="65" x="279.339" y="254.173" width="16.7771" height="98.1461"/>
   <object id="66" x="223.974" y="351.9" width="209.295" height="31.4571"/>
   <object id="67" x="30.6182" y="352.319" width="160.641" height="31.4571"/>
   <object id="68" x="673.13" y="255.649" width="13.2906" height="63.3258"/>
   <object id="69" x="686.42" y="255.649" width="114.143" height="13.2906"/>
   <object id="70" x="802.126" y="256.43" width="16.4178" height="95.3796"/>
+  <object id="72" x="48" y="96" width="64" height="32"/>
+  <object id="76" x="48" y="160" width="64" height="32"/>
+  <object id="77" x="48" y="224" width="64" height="32"/>
+  <object id="78" x="192" y="256" width="64" height="32"/>
+  <object id="79" x="192" y="192" width="64" height="32"/>
+  <object id="80" x="192" y="128" width="64" height="32"/>
+  <object id="81" x="336" y="176" width="64" height="32"/>
+  <object id="82" x="336" y="240" width="64" height="32"/>
+  <object id="83" x="336" y="112" width="64" height="32"/>
+  <object id="87" x="336" y="52" width="16" height="24"/>
+  <object id="88" x="352" y="64" width="16" height="16"/>
+  <object id="89" x="336" y="76" width="16" height="4"/>
+  <object id="90" x="64" y="12" width="32" height="36"/>
+  <object id="91" x="84" y="36"/>
+  <object id="94" x="4" y="28" width="28" height="168"/>
+  <object id="96" x="388" y="300" width="8" height="12"/>
  </objectgroup>
  <layer id="4" name="second_floor_door" width="60" height="40">
   <data encoding="csv">

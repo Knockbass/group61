@@ -2,7 +2,7 @@ package nl.saxion.game.yourgamename.entities;
 
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Rectangle;
-import nl.saxion.game.yourgamename.game_managment.Quest;
+import nl.saxion.game.yourgamename.quest_logic.Quest;
 
 public class NPC {
     private String name;
